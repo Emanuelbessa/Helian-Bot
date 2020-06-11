@@ -22,8 +22,7 @@ module.exports = {
 
 				Reino.create({
 					nome_reino: `${name}`,
-					rei: `${message.author.username}`,
-					capital: 1
+					rei: `${message.author.username}`
 				});
 
 				return message.channel.send(`Reino cadastrado com sucesso!\nO nome dele é: **${name}**`);

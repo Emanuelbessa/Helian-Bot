@@ -16,7 +16,7 @@ module.exports = {
 			
 			const Reino = Reinos(sequelize, Sequelize);
 			Reino.update({
-				historia: `${historia}`}, {where: {rei: `${message.author.username}`, capital: '1'}});
+				historia: `${historia}`}, {where: {rei: `${message.author.username}`}});
             
             return message.reply(`Historia Atualizada com sucesso`);
 			
