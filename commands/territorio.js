@@ -4,16 +4,15 @@ const config = require('../database');
 const sequelize = new Sequelize(config);
 module.exports = {
     name: 'territorio',
-    description: 'Para cadastrar corretamente digite:\n!territorio nomedoterritorio nomedoreino',
+    description: 'Para cadastrar corretamente digite:\n!territorio localização nomedoterritorio',
     async execute(message, args) {
         const { commands } = message.client;
         if (!args.length) {
-            return message.channel.send(`Você utilizou esse comando de forma incorreta, ${message.author}!\nPara cadastrar corretamente digite:\n!novoreino nomedoreino`);
+            return message.channel.send(`Você utilizou esse comando de forma incorreta, ${message.author}!\nPara cadastrar corretamente digite:\n!territorio localização nomedoterritorio`);
         } else {
 
-            const loc = args[0].toLowerCase();          
-            const tirar = args.shift();           
-            const name = args.join(" ");
+            const loc = args[0].toLowerCase();                    
+            const name = args[1].toLowerCase();
 
             const Territorio = Territorios(sequelize, Sequelize);
             let temdono = await Territorio.findOne({ where: { localizacao: `${args[0]}` } });
