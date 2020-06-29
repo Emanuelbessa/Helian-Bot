@@ -24,7 +24,31 @@ module.exports = {
                 return message.channel.send(`Todas as suas ações da rodada atual foram deletadas`);
             }          
 
-        } else {
+        } else if (args[0] == 'ver') {
+
+            const Acao = Acoes(sequelize, Sequelize);
+            const RodadaAtual = Rodada(sequelize, Sequelize);
+
+            let rodadaatual = await RodadaAtual.findAll({limit: 1, order: [[ 'createdAt', 'DESC' ]], attributes: ['id_rodada', 'rodada_atual'], raw: true });
+
+           
+            let ver = await Acao.findAll({ where: {rei: `${message.author.username}` }})
+            console.log(ver);
+            ({ where: { rei: `${message.author.username}`, rodada: `${rodadaatual[0].rodada_atual}`}, attributes: ['nome_acao', 'tropas', 'origem', 'destino'], raw: true });
+
+            if(ver){               
+
+            message.channel.send(`Suas ações da rodada atual são:\n`);
+            for(var i = 0;i < ver.length; i++){
+                
+                message.channel.send(`Ação: **${ver[i].nome_acao}**; Tropas: **${ver[i].tropas}**; Origem: **${ver[i].origem}**; Destino: **${ver[i].destino}**\n`);
+                }
+                
+            } 
+
+        } else 
+        {
+
             return message.channel.send(`Usa essa merda direito`);
             }
         }
