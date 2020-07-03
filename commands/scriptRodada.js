@@ -8,19 +8,22 @@ module.exports = {
     description: 'Para treinar corretamente digite:\n!fecharrodada  para fechar a rodada',
     async execute(message, args) {
         const { commands } = message.client;
-        if (!args.length) {
-            return message.channel.send(`Você utilizou esse comando de forma incorreta, ${message.author}!\nPara usar corretamente digite:\n!fecharrodada para fechar a rodada`);
-        } else {
+        if(message.author != 'Emanuel'){
+            return message.channel.send('Você não tem permissão para usar o comando')
+        }else {
 
             const Acao = Acoes(sequelize, Sequelize);
             const Territorio = Territorios(sequelize, Sequelize);
 
+            // RejeitadoMotivoA = atacar a si mesmo
+            // (idsdups) RejeitadoMotivoB = 2 ou + pessoas atacando o mesmo alvo 
             var idsrejeitados = [];
             var idsdups = [];
             
             let acoes = await Acao.findAll({ where: { nome_acao: "atacar"}, attributes: ['id_acao', 'tropas', 'rei', 'origem', 'destino', 'nome_acao'], raw: true });
 
-
+            console.log(acoes)
+            
              for (var i = 0; i < acoes.length; i++) {
              var atacante = acoes[i].origem;
              var defensor = acoes[i].destino;
@@ -37,7 +40,7 @@ module.exports = {
                     }
                     
                     if(defensor == acoes[k].destino ){
-                        duplicado = duplicado +1;
+                        duplicado = duplicado+1;
                         if(duplicado >= 2){
                             idsdups.push(id);
                             break;

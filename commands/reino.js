@@ -5,7 +5,7 @@ const sequelize = new Sequelize(config);
 
 module.exports = {
 	name: 'reino',
-	description: 'Mostra os todos os reinos',
+	description: 'Mostra todos os territórios do seu reino',
 	async execute(message, args) {
             
             const Territorio = Territorios(sequelize, Sequelize);

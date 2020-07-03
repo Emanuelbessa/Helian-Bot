@@ -10,15 +10,16 @@ module.exports = {
             
             const Territorio = Territorios(sequelize, Sequelize);
 
-            let temterritorio = await Territorio.findAll({ where: { rei: `${message.author.username}` }, attributes: ['localizacao', 'rei', 'nome_territorio', 'ouro', 'tropas'], raw: true });
+            let todosterritorios = await Territorio.findAll({order: [['rei', 'DESC']], attributes: ['localizacao', 'rei', 'nome_territorio'], raw: true });
 
-            if(temterritorio){
+            if(todosterritorios){
 
-                message.channel.send(`Você tem os seguintes territórios:\n`);
+                message.channel.send(`Os seguintes territórios que possuem Reis conhecidos:\n`);
                 
-                for(var i = 0;i < temterritorio.length; i++){
+                for(var i = 0;i < todosterritorios.length; i++){
                 
-                message.channel.send(`Território: **${temterritorio[i].nome_territorio}**; Localização: **${temterritorio[i].localizacao}**; Ouro no território: **${temterritorio[i].ouro}**; Tropas no território: **${temterritorio[i].tropas}**\n`);
+                message.channel.send(`Território ${i+1}:\n`)
+                message.channel.send(`Território: **${todosterritorios[i].nome_territorio}**; Localização: **${todosterritorios[i].localizacao}**; Rei:${todosterritorios[i].rei} \n`);
                 }
                 
             }else{
