@@ -4,16 +4,15 @@ const Relatorios = require('../models/RelatorioModel.js');
 const Rodadas = require('../models/RodadaModel.js');
 const Sequelize = require('sequelize');
 const config = require('../database');
-const territorio = require('./territorio.js');
 const sequelize = new Sequelize(config);
 module.exports = {
-    name: 'testandorodada',
+    name: 'fecharrodada',
     description: 'Para treinar corretamente digite:\n!fecharrodada  para fechar a rodada',
     async execute(message, args) {
         const { commands } = message.client;
-        if(message.author != 'Emanuel'){
+        if (message.author.username != "Emanuel") {
             return message.channel.send('Você não tem permissão para usar o comando')
-        }else {
+        } else {
 
             const Acao = Acoes(sequelize, Sequelize);
             const Territorio = Territorios(sequelize, Sequelize);
@@ -171,6 +170,16 @@ module.exports = {
                     }
                 }
             }
+            console.log("Estou aqui");
+            console.log(rodadaatual[0].rodada_atual);
+            console.log(rodadaatual);
+            Rodada.update({
+                rodada_atual: `${rodadaatual[0].rodada_atual}` + 1,
+            }, {
+                where: { id_rodada: 1 }
+            });
+            
+            
         }
 
         message.channel.send(`Rodada encerrada, utilize os comandos !cenario e !relatorio para maiores informações`);
