@@ -11,5 +11,6 @@ const Sequelize = require('sequelize');
     rei: Sequelize.STRING,
     origem: Sequelize.STRING,
     destino: Sequelize.STRING,
+    rodada: Sequelize.STRING,
     });
   }

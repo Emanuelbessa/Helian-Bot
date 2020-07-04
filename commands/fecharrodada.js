@@ -20,7 +20,7 @@ module.exports = {
             const Rodada = Rodadas(sequelize, Sequelize);
 
             let rodadaatual = await Rodada.findAll({ limit: 1, order: [['createdAt', 'DESC']], attributes: ['id_rodada', 'rodada_atual'], raw: true });
-            let acoes = await Acao.findAll({ where: { nome_acao: ['atacar', 'apoiar'] }, attributes: ['id_acao', 'tropas', 'rei', 'origem', 'destino', 'nome_acao'], raw: true });
+            let acoes = await Acao.findAll({ where: { nome_acao: ['atacar', 'apoiar'], rodada: `${rodadaatual[0].rodada_atual}` }, attributes: ['id_acao', 'tropas', 'rei', 'origem', 'destino', 'nome_acao'], raw: true });
 
             var ATACANTES = [];
             var DEFENSORES = [];
@@ -68,14 +68,14 @@ module.exports = {
 
             for (var i = 0; i < acoes.length; i++) {
                 let territorio = await Territorio.findOne({ where: { localizacao: `${acoes[i].destino}` }, attributes: ['localizacao', 'tropas', 'rei'], raw: true });
-
+                console.log(territorio)
                 if (MotivoA.includes(acoes[i])) {
                     Relatorio.create({
                         rei: `${acoes[i].rei}`,
                         origem: `${acoes[i].origem}`,
                         destino: `${acoes[i].destino}`,
                         mensagem: `Enquanto se preparava para o ataque, seus batedores avistaram tropas em sua direção e por isso suas tropas ficaram na cidade para se defender`,
-                        rodada: `${rodadaatual.rodada_atual}`
+                        rodada: `${rodadaatual[0].rodada_atual}`
                     });
                 } else if (MotivoB.includes(acoes[i])) {
                     Relatorio.create({
@@ -83,14 +83,14 @@ module.exports = {
                         origem: `${acoes[i].origem}`,
                         destino: `${acoes[i].destino}`,
                         mensagem: `Suas tropas decidiram recuar, pois encontraram outra nação marchando na mesma direção. Prudência é sempre bom`,
-                        rodada: `${rodadaatual.rodada_atual}`
+                        rodada: `${rodadaatual[0].rodada_atual}`
                     });
                     Relatorio.create({
                         rei: `${territorio.rei}`,
                         origem: `${acoes[i].origem}`,
                         destino: `${acoes[i].destino}`,
                         mensagem: `Foram vistos exércitos da nação ${acoes[i].origem} marchando em nossa direção mas retornaram devido a presença de outras tropas`,
-                        rodada: `${rodadaatual.rodada_atual}`
+                        rodada: `${rodadaatual[0].rodada_atual}`
                     });
                 } else {
 
@@ -101,7 +101,7 @@ module.exports = {
                             origem: `${acoes[i].origem}`,
                             destino: `${acoes[i].destino}`,
                             mensagem: `O território **${acoes[i].destino}** está vazio e não possui Rei. Você conseguiu consquistar seu PVE safado **${acoes[i].rei}**`,
-                            rodada: `${rodadaatual.rodada_atual}`
+                            rodada: `${rodadaatual[0].rodada_atual}`
                         });
                         Territorio.create({
                             localizacao: `${acoes[i].destino}`,
@@ -119,14 +119,14 @@ module.exports = {
                             origem: `${acoes[i].origem}`,
                             destino: `${acoes[i].destino}`,
                             mensagem: `Você conseguiu realizar o ataque e se saiu vencedor. Parabens pelo novo território`,
-                            rodada: `${rodadaatual.rodada_atual}`
+                            rodada: `${rodadaatual[0].rodada_atual}`
                         });
                         Relatorio.create({
                             rei: `${territorio.rei}`,
                             origem: `${acoes[i].origem}`,
                             destino: `${acoes[i].destino}`,
                             mensagem: `Você foi atacado e não é mais o dono desse território. Que pena`,
-                            rodada: `${rodadaatual.rodada_atual}`
+                            rodada: `${rodadaatual[0].rodada_atual}`
                         });
                         var novastropas = acoes[i].tropas - territorio.tropas
                         Territorio.update({
@@ -146,14 +146,14 @@ module.exports = {
                             origem: `${acoes[i].origem}`,
                             destino: `${acoes[i].destino}`,
                             mensagem: `Você realizou o ataque, entretanto perdeu todas as tropas. Cuidado com a vingança...`,
-                            rodada: `${rodadaatual.rodada_atual}`
+                            rodada: `${rodadaatual[0].rodada_atual}`
                         });
                         Relatorio.create({
                             rei: `${territorio.rei}`,
                             origem: `${acoes[i].origem}`,
                             destino: `${acoes[i].destino}`,
                             mensagem: `Você foi atacado e suas tropas resistiram bravamente, tome cuidado, um novo ataque pode acontecer a qualquer momento`,
-                            rodada: `${rodadaatual.rodada_atual}`
+                            rodada: `${rodadaatual[0].rodada_atual}`
                         });
                         var novastropas2 = territorio.tropas - acoes[i].tropas
                         Territorio.update({
@@ -162,7 +162,6 @@ module.exports = {
                             where: { localizacao: `${acoes[i].origem}` }
                         });
                         Territorio.update({
-                            rei: `${acoes[i].rei}`,
                             tropas: `${novastropas2}`
                         }, {
                             where: { localizacao: `${acoes[i].destino}` }
@@ -170,16 +169,12 @@ module.exports = {
                     }
                 }
             }
-            console.log("Estou aqui");
-            console.log(rodadaatual[0].rodada_atual);
-            console.log(rodadaatual);
+            var novarodada = parseInt(rodadaatual[0].rodada_atual) +1; 
             Rodada.update({
-                rodada_atual: `${rodadaatual[0].rodada_atual}` + 1,
+                rodada_atual: novarodada,
             }, {
                 where: { id_rodada: 1 }
-            });
-            
-            
+            });            
         }
 
         message.channel.send(`Rodada encerrada, utilize os comandos !cenario e !relatorio para maiores informações`);

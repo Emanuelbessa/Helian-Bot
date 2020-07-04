@@ -1,5 +1,6 @@
 const Acoes = require('../models/AcoesModel.js');
 const Territorios = require('../models/TerritorioModel.js');
+const Rodadas = require('../models/RodadaModel.js');
 const Sequelize = require('sequelize');
 const config = require('../database');
 const sequelize = new Sequelize(config);
@@ -17,9 +18,12 @@ module.exports = {
                     
             const Acao = Acoes(sequelize, Sequelize);
             const Territorio = Territorios(sequelize, Sequelize);
+            const Rodada = Rodadas(sequelize, Sequelize);
 
             let dono = await Territorio.findOne({ where: { rei: `${message.author.username}`, localizacao: `${origem}` } });
-            let ataque = await Acao.findOne({ where: { rei: `${message.author.username}`, origem: `${origem}` } });
+            let rodadaatual = await Rodada.findAll({ limit: 1, order: [['createdAt', 'DESC']], attributes: ['id_rodada', 'rodada_atual'], raw: true });
+            console.log(rodadaatual[0].rodada_atual)
+            let ataque = await Acao.findOne({ where: { rei: `${message.author.username}`, origem: `${origem}`, rodada: `${rodadaatual[0].rodada_atual}`} });
             
 
             if(ataque){
@@ -33,8 +37,9 @@ module.exports = {
                     origem: `${origem}`,
                     destino: `${destino}`,
                     rei: `${message.author.username}`,
+                    rodada: `${rodadaatual[0].rodada_atual}`
                 });
-                message.channel.send(`Ação de ataque registrada`);
+               return message.channel.send(`Ação de ataque registrada`);
 
             } else {
 

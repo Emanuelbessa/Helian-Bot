@@ -1,4 +1,5 @@
 const Relatorios = require('../models/RelatorioModel.js');
+const Rodada = require('../models/RodadaModel.js');
 const Sequelize = require('sequelize');
 const config = require('../database');
 const sequelize = new Sequelize(config);
@@ -9,8 +10,11 @@ module.exports = {
 	async execute(message, args) {
             
             const Relatorio = Relatorios(sequelize, Sequelize);
+            const RodadaAtual = Rodada(sequelize, Sequelize);
 
-            let seurelatorio = await Relatorio.findAll({ where: { rei: `${message.author.username}` }, attributes: ['origem', 'rei', 'destino', 'mensagem'], raw: true });
+            let rodadaatual = await RodadaAtual.findAll({limit: 1, order: [[ 'createdAt', 'DESC' ]], attributes: ['id_rodada', 'rodada_atual'], raw: true });
+            var rodadacerta = parseInt(rodadaatual[0].rodada_atual)-1;
+            let seurelatorio = await Relatorio.findAll({ where: { rei: `${message.author.username}`, rodada: rodadacerta }, attributes: ['origem', 'rei', 'destino', 'mensagem', 'rodada'], raw: true });
 
             if(seurelatorio){
 
