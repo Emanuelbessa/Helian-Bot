@@ -49,7 +49,7 @@ module.exports = {
         } else 
         {
 
-            return message.channel.send(`Usa essa merda direito`);
+            return message.channel.send(`Comando de ação usado de forma incorreta`);
             }
         }
 };
