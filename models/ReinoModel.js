@@ -7,7 +7,7 @@ const Sequelize = require('sequelize');
       primaryKey: true
     },
     nome_reino: Sequelize.STRING,
-    historia: Sequelize.TEXT,
+    inicial_conquistado: Sequelize.INTEGER,
     rei: Sequelize.STRING,
     });
   }
