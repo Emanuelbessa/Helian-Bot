@@ -14,19 +14,26 @@ module.exports = {
 
 			const name = args.join(" ");
 			const Reino = Reinos(sequelize, Sequelize);
-			let temreino = await Reino.findOne({ where: { rei: `${message.author.username}` } });
-			if (temreino) {
 
-				return message.channel.send(`Você já possui reino cadastrado`);
+
+			
+			let temreino = await Reino.findOne({ where: { rei: `${message.author.username}` } });
+
+			if (temreino) {
+				return message.channel.send(`Você já é dono de um Reino`);
 			} else {
 
 				Reino.create({
 					nome_reino: `${name}`,
-					rei: `${message.author.username}`
+					rei: `${message.author.username}`,
+					ouro: 10,
+					inicial_conquistado: 0
 				});
 
-				return message.channel.send(`Reino cadastrado com sucesso!\nO nome dele é: **${name}**`);
+				return message.channel.send(`Reino conquistado com sucesso!\nO nome dele é: **${name}**`);
 			}
+
+
 		}
 	},
 };
