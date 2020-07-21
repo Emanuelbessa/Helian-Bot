@@ -14,7 +14,7 @@ module.exports = {
 
 			const name = args.join(" ");
 			const Reino = Reinos(sequelize, Sequelize);
-			//Testando caralho
+
 
 			
 			let temreino = await Reino.findOne({ where: { rei: `${message.author.username}` } });
