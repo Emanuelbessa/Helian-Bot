@@ -45,7 +45,7 @@ module.exports = {
                 }
                 
             } 
-
+            message.channel.send(`Para apagar suas ações nesta rodada, digite !acao apagar`);
         } else 
         {
 

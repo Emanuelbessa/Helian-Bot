@@ -22,9 +22,8 @@ module.exports = {
                 
                 for(var i = 0;i < seurelatorio.length; i++){
                 
-                message.channel.send(`Mensagem nº ${i+1}:\n`)
                 message.channel.send(`Território de Origem: **${seurelatorio[i].origem}**; Território de Destino: **${seurelatorio[i].destino}**\n`);
-                message.channel.send(`Mensagem:\n**${seurelatorio[i].mensagem}**`);    
+                message.channel.send(`**${seurelatorio[i].mensagem}**`);    
             }
                 
             }else{

@@ -39,7 +39,7 @@ module.exports = {
                     rei: `${message.author.username}`,
                     rodada: `${rodadaatual[0].rodada_atual}`
                 });
-               return message.channel.send(`Ação de ataque registrada`);
+               return message.channel.send(`Ação de ataque registrada. Para ver suas ações nesta rodada, digite !acao ver`);
 
             } else {
 
