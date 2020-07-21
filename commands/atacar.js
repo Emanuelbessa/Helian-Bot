@@ -43,7 +43,7 @@ module.exports = {
 
             } else {
 
-                return message.channel.send(`Você não possui recursos suficiente ou o territorio não é seu`);
+                return message.channel.send(`Você não possui tropas suficientes ou o territorio não é seu`);
             }
         }
     },
