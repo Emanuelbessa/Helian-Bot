@@ -22,6 +22,11 @@ module.exports = {
                 message.channel.send(`Território: **${todosterritorios[i].nome_territorio}**; Localização: **${todosterritorios[i].localizacao}**; Rei:${todosterritorios[i].rei} \n`);
                 }
                 
+                /*
+                Esses são os Reinos conhecidos:
+                Reino: Alderan; Territórios: f8, f9, f10; Rei: Zeldy
+                */
+                
             }else{
                 return message.channel.send(`Você não possui territorios`); 
             }
