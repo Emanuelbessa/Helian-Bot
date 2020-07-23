@@ -283,11 +283,23 @@ module.exports = {
                                     rodada: `${rodadaatual[0].rodada_atual}`
                                 });
                             })
-                            var prejuizo = Math.round(defesa / (auxatq.length + 1))
-                            var novastropas = acoes[i].tropas - prejuizo
+
+
+                            var prejuizo = defesa
+
+                            while(prejuizo >= 1){
+
+                                if(acoes[i].tropas != 0 ){
+                                    acoes[i].tropas--
+                                    prejuizo--
+                                }
+                                for (let q = 0; q < auxatq.length; q++) {
+                                   auxatq[q].tropas--
+                                   prejuizo--                                    
+                                }
+                            }
 
                             auxatq.forEach(function (n, i) {
-                                n.tropas = n.tropas - prejuizo
                                 Territorio.update({
                                     tropas: `${n.tropas}`
                                 }, {
@@ -296,7 +308,7 @@ module.exports = {
                             })
 
                             Territorio.update({
-                                tropas: `${novastropas}`
+                                tropas: `${acoes[i].tropas}`
                             }, {
                                 where: { localizacao: `${acoes[i].origem}` }
                             });
@@ -343,11 +355,22 @@ module.exports = {
                                 });
                             })
 
-                            var prejuizo = Math.round(ataque / (auxdef.length + 1))
-                            var novastropas = terr.tropas - prejuizo
+                            var prejuizo = ataque
 
-                            auxatq.forEach(function (n, i) {
-                                n.tropas = n.tropas - prejuizo
+                            while(prejuizo >= 1){
+
+                                if(terr.tropas != 0 ){
+                                    terr.tropas--
+                                    prejuizo--
+                                }
+                                for (let q = 0; q < auxdef.length; q++) {
+                                   auxdef[q].tropas--
+                                   prejuizo--                                    
+                                }
+                            }
+
+
+                            auxdef.forEach(function (n, i) {
                                 Territorio.update({
                                     tropas: `${n.tropas}`
                                 }, {
@@ -356,7 +379,7 @@ module.exports = {
                             })
 
                             Territorio.update({
-                                tropas: `${novastropas}`
+                                tropas: `${terr.tropas}`
                             }, {
                                 where: { localizacao: `${acoes[i].destino}` }
                             });
