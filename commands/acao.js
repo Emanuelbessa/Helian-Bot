@@ -6,7 +6,7 @@ const config = require('../database');
 const sequelize = new Sequelize(config);
 module.exports = {
     name: 'acao',
-    description: '----',
+    description: 'Comando para gerenciar suas ações na rodada, digite !acao ver para verificar suas ações feitas até o momento e !acao apagar para apagar todas',
     async execute(message, args) {
         const { commands } = message.client;
         if (args[0] == 'apagar') {

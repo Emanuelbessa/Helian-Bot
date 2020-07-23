@@ -7,7 +7,7 @@ const sequelize = new Sequelize(config);
 
 module.exports = {
     name: 'cenario',
-    description: '---',
+    description: 'Comando que lhe informa tudo que é conhecido sobre os outros reinos',
     async execute(message, args) {
 
         const Territorio = Territorios(sequelize, Sequelize);

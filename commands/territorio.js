@@ -6,7 +6,7 @@ const config = require('../database');
 const sequelize = new Sequelize(config);
 module.exports = {
     name: 'territorio',
-    description: 'Para cadastrar corretamente digite:\n!territorio',
+    description: 'Este comando serve para cadastrar seu primeiro território. Para cadastrar digite !territorio',
     async execute(message, args) {
         const { commands } = message.client;
         if (args.length >= 1) {

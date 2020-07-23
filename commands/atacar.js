@@ -8,11 +8,11 @@ const config = require('../database');
 const sequelize = new Sequelize(config);
 module.exports = {
     name: 'atacar',
-    description: 'Para treinar corretamente digite:\n!atacar origem destino',
+    description: 'Para atacar corretamente digite:\n!atacar origem destino. Todas as tropas do território de origem irão atacar',
     async execute(message, args) {
         const { commands } = message.client;
         if (!args.length || args.length > 2 || args.length == 1) {
-            return message.channel.send(`Você utilizou esse comando de forma incorreta, ${message.author}!\nPara cadastrar corretamente digite:\n!atacar origem destino`);
+            return message.channel.send(`Você utilizou esse comando de forma incorreta, ${message.author}!\nDigite:\n!atacar origem destino`);
         } else {
             
             const origem = args[0].toLowerCase();

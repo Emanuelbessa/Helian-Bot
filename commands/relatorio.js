@@ -6,7 +6,7 @@ const sequelize = new Sequelize(config);
 
 module.exports = {
     name: 'relatorio',
-    description: '---',
+    description: 'Informa o relatório de suas ações e acontecimentos da última rodada',
     async execute(message, args) {
 
         /*

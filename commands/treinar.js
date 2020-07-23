@@ -5,7 +5,7 @@ const config = require('../database');
 const sequelize = new Sequelize(config);
 module.exports = {
     name: 'treinar',
-    description: 'Para treinar as tropas corretamente digite:\n!treinar quantidadedetropas localização',
+    description: 'Para treinar as tropas corretamente digite:\n!treinar quantidade_de_tropas localização',
     async execute(message, args) {
         const { commands } = message.client;
         if (!args.length) {

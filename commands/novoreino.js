@@ -4,8 +4,8 @@ const config = require('../database');
 const sequelize = new Sequelize(config);
 module.exports = {
 	name: 'novoreino',
-	description: 'Cadastra você como reino',
-	mododeusar: 'Para cadastrar corretamente digite:\n!novoreino nomedoreino',
+	description: 'Cadastra você como reino. Digite !novoreino nome_do_reino',
+	mododeusar: 'Digite:\n!novoreino nomedoreino',
 	async execute(message, args) {
 		const { commands } = message.client;
 		if (!args.length) {

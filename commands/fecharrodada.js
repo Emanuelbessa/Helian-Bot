@@ -8,7 +8,7 @@ const config = require('../database');
 const sequelize = new Sequelize(config);
 module.exports = {
     name: 'fecharrodada',
-    description: 'Para treinar corretamente digite:\n!fecharrodada  para fechar a rodada',
+    description: 'Digite:\n!fecharrodada  para fechar a rodada',
     async execute(message, args) {
         const { commands } = message.client;
         if (message.author.username != "Emanuel") {
