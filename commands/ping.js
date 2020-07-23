@@ -1,3 +1,4 @@
+const {name} = require('./help');
 module.exports = {
 	name: 'ping',
 	description: 'Ping!',
