@@ -9,5 +9,6 @@ const Sequelize = require('sequelize');
     nome_reino: Sequelize.STRING,
     inicial_conquistado: Sequelize.INTEGER,
     rei: Sequelize.STRING,
+    ouro: Sequelize.INTEGER,
     });
   }

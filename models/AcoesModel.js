@@ -7,6 +7,7 @@ const Sequelize = require('sequelize');
       primaryKey: true
     },
     nome_acao: Sequelize.STRING,
+    apoio: Sequelize.STRING,
     tropas: Sequelize.INTEGER,
     rei: Sequelize.STRING,
     origem: Sequelize.STRING,
