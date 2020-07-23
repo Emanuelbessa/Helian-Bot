@@ -12,6 +12,15 @@ module.exports = {
             return message.channel.send('Você não tem permissão para usar o comando')
         }else {
 
+
+            
+		/*console.log("Start!")
+		setInterval(function () {
+			message.channel.send('Testando help a cada 15s');
+			message.channel.send(`!${name}`);
+		}, 1000 * 15)
+        */
+        
             const Acao = Acoes(sequelize, Sequelize);
             const Territorio = Territorios(sequelize, Sequelize);
 

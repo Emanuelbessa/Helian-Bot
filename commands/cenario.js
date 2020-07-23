@@ -1,36 +1,32 @@
 const Territorios = require('../models/TerritorioModel.js');
+const Reinos = require('../models/ReinoModel.js');
 const Sequelize = require('sequelize');
 const config = require('../database');
+const reino = require('./reino.js');
 const sequelize = new Sequelize(config);
 
 module.exports = {
-	name: 'cenario',
-	description: '---',
-	async execute(message, args) {
-            
-            const Territorio = Territorios(sequelize, Sequelize);
+    name: 'cenario',
+    description: '---',
+    async execute(message, args) {
 
-            let todosterritorios = await Territorio.findAll({order: [['rei', 'DESC']], attributes: ['localizacao', 'rei', 'nome_territorio'], raw: true });
+        const Territorio = Territorios(sequelize, Sequelize);
+        const Reino = Reinos(sequelize, Sequelize);
 
-            if(todosterritorios){
+        let todosterritorios = await Territorio.findAll({ order: [['rei', 'DESC']], attributes: ['localizacao', 'rei', 'nome_territorio'], raw: true });
+        let reinos = await Reino.findAll({ order: [['rei', 'DESC']], attributes: ['rei', 'nome_reino'], raw: true });
 
-                message.channel.send(`Os seguintes territórios que possuem Reis conhecidos:\n`);
-                
-                for(var i = 0;i < todosterritorios.length; i++){
-                
-                message.channel.send(`Território ${i+1}:\n`)
-                message.channel.send(`Território: **${todosterritorios[i].nome_territorio}**; Localização: **${todosterritorios[i].localizacao}**; Rei:${todosterritorios[i].rei} \n`);
-                }
-                
-                /*
-                Esses são os Reinos conhecidos:
-                Reino: Alderan; Territórios: f8, f9, f10; Rei: Zeldy
-                */
-                
-            }else{
-                return message.channel.send(`Você não possui territorios`); 
-            }
+        message.channel.send(`Esses são os Reinos conhecidos:\n`);
 
-                       
+        for (var i = 0; i < reinos.length; i++) {
+
+            var nomes = ""
+
+            todosterritorios.forEach(function (p, i) {
+                nomes = nomes + " " + "- "+  p.localizacao 
+            })
+
+            message.channel.send(`Reino: **${reinos[i].nome_reino}**; Territórios: **${nomes}**; Rei: **${reinos[i].rei}**\n`);
+        }
     },
 };

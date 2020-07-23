@@ -9,7 +9,6 @@ const Sequelize = require('sequelize');
     localizacao: Sequelize.STRING,
     nome_territorio: Sequelize.STRING,
     rei: Sequelize.STRING,
-    ouro: Sequelize.INTEGER,
     tropas: Sequelize.INTEGER,
     });
   }
