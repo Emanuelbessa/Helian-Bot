@@ -15,8 +15,8 @@ module.exports = {
             return message.channel.send(`Você utilizou esse comando de forma incorreta, ${message.author}!\nPara apoiar corretamente digite:\n!atacar origem destino`);
         } else if (args[0] == 'ataque' || args[0] == 'defesa') {
 
-            const intencao = args[0].toLowerCase();
-            const origem = args[1].toLowerCase();
+            const intencao = args[1].toLowerCase();
+            const origem = args[0].toLowerCase();
             const destino = args[2].toLowerCase();
 
             const Mapa = Mapas(sequelize, Sequelize);
