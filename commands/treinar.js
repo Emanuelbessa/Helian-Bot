@@ -21,6 +21,7 @@ module.exports = {
             let dono = await Territorio.findOne({ where: { rei: `${message.author.username}`, localizacao: `${loc}` } });
             let destino = await Territorio.findOne({ where: { localizacao: `${loc}` } });
             let reino = await Reino.findOne({ where: { rei: `${message.author.username}` }, attributes: ['ouro', 'rei', 'nome_reino'], raw: true });
+            // Checar se existe ação realizada com esse território.
 
             if (dono) {
                 if (ntropas <= reino.ouro) {

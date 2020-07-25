@@ -22,7 +22,7 @@ module.exports = {
             const Rodada = Rodadas(sequelize, Sequelize);
 
             let rodadaatual = await Rodada.findAll({ limit: 1, order: [['createdAt', 'DESC']], attributes: ['id_rodada', 'rodada_atual'], raw: true });
-            let acoes = await Acao.findAll({ where: { nome_acao: ['atacar', 'apoiar'], rodada: `${rodadaatual[0].rodada_atual}` }, attributes: ['id_acao', 'apoio', 'tropas', 'rei', 'origem', 'destino', 'nome_acao'], raw: true });
+            let acoes = await Acao.findAll({ where: { nome_acao: ['atacar', 'apoiar'], rodada: `${rodadaatual[0].rodada_atual}` }, attributes: ['id_acao', 'nome_acao', 'apoio', 'tropas', 'rei', 'origem', 'destino'], raw: true });
 
             var ATACANTES = [];
             var DEFENSORES = [];
@@ -47,6 +47,7 @@ module.exports = {
             12. Apoios Mal sucedidos
             13. Apoiado
             */
+
             console.log(acoes);
 
             for (var i = 0; i < acoes.length; i++) {
@@ -61,14 +62,63 @@ module.exports = {
                     APOIADO.push(acoes[i].destino);
                 }
             }
-
-            console.log(ATACANTES);
+            // Testando quem vai cair no MotivoA para depois testar o MotivoB
             for (var i = 0; i < acoes.length; i++) {
                 if (ATACANTES.includes(acoes[i].origem) && DEFENSORES.includes(acoes[i].origem)) {
                     MotivoA.push(acoes[i]);
                 }
             }
+            // Criando os Relatórios do Motivo A
+            for (let i = 0; i < MotivoA.length; i++) {
+                let territo = await Territorio.findOne({ where: { localizacao: `${MotivoA[i].destino}` }, attributes: ['localizacao', 'tropas', 'rei'], raw: true });
+                // Ataques PVP recuando por ser atacado
+                Relatorio.create({
+                    rei: `${MotivoA[i].rei}`,
+                    origem: `${MotivoA[i].origem}`,
+                    destino: `${MotivoA[i].destino}`,
+                    mensagem: '4',
+                    rodada: `${rodadaatual[0].rodada_atual}`
+                });
+                // Defesa PVP quase ataque sem motivo aparente
+                if (territo) {
+                    Relatorio.create({
+                        rei: `${territo.rei}`,
+                        origem: `${MotivoA[i].origem}`,
+                        destino: `${MotivoA[i].destino}`,
+                        mensagem: '9',
+                        rodada: `${rodadaatual[0].rodada_atual}`
+                    });
+                }
 
+            }
+            // Removendo ações invalidadas pelo motivo A do Array de acoes
+            acoes = acoes.filter(function (el, i) {
+                return MotivoA.indexOf(el) < 0
+            })
+
+            console.log(acoes);
+
+            var ATACANTES = [];
+            var DEFENSORES = [];
+            var APOIADOR = [];
+            var APOIADO = [];
+
+            for (var i = 0; i < acoes.length; i++) {
+
+                if (acoes[i].nome_acao == 'atacar') {
+                    ATACANTES.push(acoes[i].origem);
+                    DEFENSORES.push(acoes[i].destino);
+                }
+                if (acoes[i].nome_acao == 'apoiar') {
+
+                    APOIADOR.push(acoes[i].origem);
+                    APOIADO.push(acoes[i].destino);
+                }
+            }
+
+            console.log(acoes);
+
+            // Começando fase de testes do Motivo B
             let findDuplicates = arr => arr.filter((item, index) => arr.indexOf(item) != index)
 
             var defensorduplicado = findDuplicates(DEFENSORES)
@@ -80,108 +130,129 @@ module.exports = {
                     }
                 }
             }
-
-            for (var i = 0; i < acoes.length; i++) {
-                for (var k = 0; k < APOIADOR.length; k++) {
-                    if (acoes[i].destino == APOIADOR[k]) {
-                        MotivoC.push(acoes[i])
-                    }
-                }
-            }
-
-            for (var i = 0; i < acoes.length; i++) {
-                let territorio = await Territorio.findOne({ where: { localizacao: `${acoes[i].destino}` }, attributes: ['localizacao', 'tropas', 'rei'], raw: true });
-                console.log(territorio)
-                if (MotivoA.includes(acoes[i])) {
-                    // Ataques PVP recuando por ser atacado
-                    Relatorio.create({
-                        rei: `${acoes[i].rei}`,
-                        origem: `${acoes[i].origem}`,
-                        destino: `${acoes[i].destino}`,
-                        mensagem: '4',
-                        rodada: `${rodadaatual[0].rodada_atual}`
-                    });
-                    // Defesa PVP quase ataque sem motivo aparente
+            // Criando os Relatórios do Motivo B
+            for (let i = 0; i < MotivoB.length; i++) {
+                let territorio = await Territorio.findOne({ where: { localizacao: `${MotivoB[i].destino}` }, attributes: ['localizacao', 'tropas', 'rei'], raw: true });
+                // Ataque PVP recuando por ter outra nação atacando
+                Relatorio.create({
+                    rei: `${MotivoB[i].rei}`,
+                    origem: `${MotivoB[i].origem}`,
+                    destino: `${MotivoB[i].destino}`,
+                    mensagem: '5',
+                    rodada: `${rodadaatual[0].rodada_atual}`
+                });
+                // Defesa PVP quase ataque 2x+
+                if (territorio) {
                     Relatorio.create({
                         rei: `${territorio.rei}`,
-                        origem: `${acoes[i].origem}`,
-                        destino: `${acoes[i].destino}`,
-                        mensagem: '9',
-                        rodada: `${rodadaatual[0].rodada_atual}`
-                    });
-                } else if (MotivoB.includes(acoes[i])) {
-                    // Ataque PVP recuando por ter outra nação atacando
-                    Relatorio.create({
-                        rei: `${acoes[i].rei}`,
-                        origem: `${acoes[i].origem}`,
-                        destino: `${acoes[i].destino}`,
-                        mensagem: '5',
-                        rodada: `${rodadaatual[0].rodada_atual}`
-                    });
-                    // Defesa PVP quase ataque 2x+
-                    Relatorio.create({
-                        rei: `${territorio.rei}`,
-                        origem: `${acoes[i].origem}`,
-                        destino: `${acoes[i].destino}`,
+                        origem: `${MotivoB[i].origem}`,
+                        destino: `${MotivoB[i].destino}`,
                         mensagem: '8',
                         rodada: `${rodadaatual[0].rodada_atual}`
                     });
-                } else if (MotivoC.includes(acoes[i])) {
-                    // Tentativa de Apoio Falha - Fui atacado
-                    Relatorio.create({
-                        rei: `${acoes[i].rei}`,
-                        origem: `${acoes[i].origem}`,
-                        destino: `${acoes[i].destino}`,
-                        mensagem: '10',
-                        rodada: `${rodadaatual[0].rodada_atual}`
-                    });
-                } else if (!territorio) {
-                    // Primeiro Caso de ataque Bem sucedido, PVE
-                    Relatorio.create({
-                        rei: `${acoes[i].rei}`,
-                        origem: `${acoes[i].origem}`,
-                        destino: `${acoes[i].destino}`,
-                        mensagem: '1',
-                        rodada: `${rodadaatual[0].rodada_atual}`
-                    });
-                    let terri = await Territorio.findOne({ where: { localizacao: `${acoes[i].origem}` }, attributes: ['localizacao', 'tropas', 'rei', 'nome_territorio'], raw: true });
-                    Territorio.create({
-                        localizacao: `${acoes[i].destino}`,
-                        rei: `${acoes[i].rei}`,
-                        nome_territorio: `${terri.nome_territorio}`,
-                        tropas: `0`
-                    });
-                    Reino.increment('ouro', { by: 6, where: { nome_reino: `${terri.nome_territorio}` } });
+                }
+
+            }
+            // Removendo ações invalidadas pelo motivo B do Array de acoes
+            acoes = acoes.filter(function (el, i) {
+                return MotivoB.indexOf(el) < 0
+            })
+
+
+            var app = acoes.filter(function (a) {
+                return a.nome_acao == 'atacar'
+            })
+
+            console.log(app);
+            //Testando quem vai cair no Motivo C
+            for (var i = 0; i < app.length; i++) {
+                for (var k = 0; k < APOIADOR.length; k++) {
+                    if (app[i].destino == APOIADOR[k]) {
+                        MotivoC.push(app[i])
+                    }
                 }
             }
-
-            acoes = acoes.filter(function (el) {
-                return MotivoA.indexOf(el) < 0;
-            });
-            acoes = acoes.filter(function (el) {
-                return MotivoB.indexOf(el) < 0;
-            });
+            // Criando os Relatórios do Motivo C
+            for (let i = 0; i < MotivoC.length; i++) {
+                // Tentativa de Apoio Falha - Fui atacado
+                Relatorio.create({
+                    rei: `${MotivoC[i].rei}`,
+                    origem: `${MotivoC[i].origem}`,
+                    destino: `${MotivoC[i].destino}`,
+                    mensagem: '10',
+                    rodada: `${rodadaatual[0].rodada_atual}`
+                });
+            }
+            // Removendo ações invalidadas pelo motivo C do Array de acoes
             acoes = acoes.filter(function (el) {
                 return MotivoC.indexOf(el) < 0;
             });
 
+            console.log("aqui 2");
 
             var apoiadores = acoes.filter(function (a) {
                 return a.nome_acao == 'apoiar'
             });
 
+            var ATACANTES = [];
+            var DEFENSORES = [];
+            var APOIADOR = [];
+            var APOIADO = [];
+
+            for (var i = 0; i < acoes.length; i++) {
+
+                if (acoes[i].nome_acao == 'atacar') {
+                    ATACANTES.push(acoes[i].origem);
+                    DEFENSORES.push(acoes[i].destino);
+                }
+                if (acoes[i].nome_acao == 'apoiar') {
+
+                    APOIADOR.push(acoes[i].origem);
+                    APOIADO.push(acoes[i].destino);
+                }
+            }
+
+            // Se o destino do apoio não é origem ou destino de um ataque, bem sucedido / apoiado
+            // A conquista PVE deve ser parte do for do PVP, pois existe a possiblidade de alguém apoiar o território vazio
+
+            for (let i = 0; i < apoiadores.length; i++) {
+                if (!DEFENSORES.includes(apoiadores[i].destino)) {
+                    let sup = await Territorio.findOne({ where: { localizacao: `${apoiadores[i].destino}` }, attributes: ['localizacao', 'rei'], raw: true });
+                    
+                    Relatorio.create({
+                        rei: `${apoiadores[i].rei}`,
+                        origem: `${apoiadores[i].origem}`,
+                        destino: `${apoiadores[i].destino}`,
+                        mensagem: '11',
+                        rodada: `${rodadaatual[0].rodada_atual}`
+                    });
+
+                    Relatorio.create({
+                        rei: `${sup.rei}`,
+                        origem: `${apoiadores[i].origem}`,
+                        destino: `${apoiadores[i].destino}`,
+                        mensagem: '13',
+                        rodada: `${rodadaatual[0].rodada_atual}`
+                    });
+
+                }
+            }
             var atacantes = acoes.filter(function (a) {
                 return a.nome_acao == 'atacar'
             });
+            //
 
             // PVPs que de fato aconteceram
             for (var i = 0; i < acoes.length; i++) {
-                let terr = await Territorio.findOne({ where: { localizacao: `${acoes[i].destino}` }, attributes: ['localizacao', 'tropas', 'rei'], raw: true });
-
                 if (acoes[i].nome_acao === 'atacar') {
+                    let terr = await Territorio.findOne({ where: { localizacao: `${acoes[i].destino}` }, attributes: ['localizacao', 'tropas', 'rei'], raw: true });
 
                     var ataque = acoes[i].tropas
-                    var defesa = terr.tropas
+                    if (terr) {
+                        var defesa = terr.tropas
+                    } else {
+                        var defesa = 0
+                    }
                     var apoioatk = false
                     var apoiodef = false
 
@@ -217,30 +288,50 @@ module.exports = {
                     }
 
                     if (ataque > defesa) {
-                        Relatorio.create({
-                            rei: `${acoes[i].rei}`,
-                            origem: `${acoes[i].origem}`,
-                            destino: `${acoes[i].destino}`,
-                            mensagem: '2',
-                            rodada: `${rodadaatual[0].rodada_atual}`
-                        });
-                        Relatorio.create({
-                            rei: `${terr.rei}`,
-                            origem: `${acoes[i].origem}`,
-                            destino: `${acoes[i].destino}`,
-                            mensagem: '7',
-                            rodada: `${rodadaatual[0].rodada_atual}`
-                        });
-
+                        if (!terr) {
+                            // Primeiro Caso de ataque Bem sucedido, PVE
+                            Relatorio.create({
+                                rei: `${acoes[i].rei}`,
+                                origem: `${acoes[i].origem}`,
+                                destino: `${acoes[i].destino}`,
+                                mensagem: '1',
+                                rodada: `${rodadaatual[0].rodada_atual}`
+                            });
+                            let terr2 = await Territorio.findOne({ where: { localizacao: `${acoes[i].origem}` }, attributes: ['localizacao', 'tropas', 'rei', 'nome_territorio'], raw: true });
+                            Territorio.create({
+                                localizacao: `${acoes[i].destino}`,
+                                rei: `${acoes[i].rei}`,
+                                nome_territorio: `${terr2.nome_territorio}`,
+                                tropas: `0`
+                            });
+                            Reino.increment('ouro', { by: 6, where: { nome_reino: `${terr2.nome_territorio}` } });
+                        } else {
+                            Relatorio.create({
+                                rei: `${acoes[i].rei}`,
+                                origem: `${acoes[i].origem}`,
+                                destino: `${acoes[i].destino}`,
+                                mensagem: '2',
+                                rodada: `${rodadaatual[0].rodada_atual}`
+                            });
+                            Relatorio.create({
+                                rei: `${terr.rei}`,
+                                origem: `${acoes[i].origem}`,
+                                destino: `${acoes[i].destino}`,
+                                mensagem: '7',
+                                rodada: `${rodadaatual[0].rodada_atual}`
+                            });
+                        }
                         if (apoiodef) {
                             auxdef.forEach(function (t, indice) {
-                                Relatorio.create({
-                                    rei: `${terr.rei}`,
-                                    origem: `${t.origem}`,
-                                    destino: `${acoes[i].destino}`,
-                                    mensagem: '13',
-                                    rodada: `${rodadaatual[0].rodada_atual}`
-                                });
+                                if (terr) {
+                                    Relatorio.create({
+                                        rei: `${terr.rei}`,
+                                        origem: `${t.origem}`,
+                                        destino: `${acoes[i].destino}`,
+                                        mensagem: '13',
+                                        rodada: `${rodadaatual[0].rodada_atual}`
+                                    });
+                                }
                                 Relatorio.create({
                                     rei: `${t.rei}`,
                                     origem: `${t.origem}`,
@@ -274,7 +365,6 @@ module.exports = {
                                     mensagem: '13',
                                     rodada: `${rodadaatual[0].rodada_atual}`
                                 });
-
                                 Relatorio.create({
                                     rei: `${t.rei}`,
                                     origem: `${t.origem}`,
@@ -287,18 +377,18 @@ module.exports = {
 
                             var prejuizo = defesa
 
-                            while(prejuizo >= 1){
+                            while (prejuizo >= 1) {
 
-                                if(acoes[i].tropas != 0 ){
+                                if (acoes[i].tropas != 0) {
                                     acoes[i].tropas--
                                     prejuizo--
                                 }
                                 for (let q = 0; q < auxatq.length; q++) {
-                                   auxatq[q].tropas--
-                                   prejuizo--                                    
+                                    auxatq[q].tropas--
+                                    prejuizo--
                                 }
                             }
-
+                            //Pode melhorar performance, att mesmo com def = 0
                             auxatq.forEach(function (n, i) {
                                 Territorio.update({
                                     tropas: `${n.tropas}`
@@ -329,23 +419,26 @@ module.exports = {
                             mensagem: '3',
                             rodada: `${rodadaatual[0].rodada_atual}`
                         });
-                        Relatorio.create({
-                            rei: `${terr.rei}`,
-                            origem: `${acoes[i].origem}`,
-                            destino: `${acoes[i].destino}`,
-                            mensagem: '6',
-                            rodada: `${rodadaatual[0].rodada_atual}`
-                        });
-
+                        if (terr) {
+                            Relatorio.create({
+                                rei: `${terr.rei}`,
+                                origem: `${acoes[i].origem}`,
+                                destino: `${acoes[i].destino}`,
+                                mensagem: '6',
+                                rodada: `${rodadaatual[0].rodada_atual}`
+                            });
+                        }
                         if (apoiodef) {
                             auxdef.forEach(function (t, indice) {
-                                Relatorio.create({
-                                    rei: `${terr.rei}`,
-                                    origem: `${t.origem}`,
-                                    destino: `${acoes[i].destino}`,
-                                    mensagem: '13',
-                                    rodada: `${rodadaatual[0].rodada_atual}`
-                                });
+                                if (terr) {
+                                    Relatorio.create({
+                                        rei: `${terr.rei}`,
+                                        origem: `${t.origem}`,
+                                        destino: `${acoes[i].destino}`,
+                                        mensagem: '13',
+                                        rodada: `${rodadaatual[0].rodada_atual}`
+                                    });
+                                }
                                 Relatorio.create({
                                     rei: `${t.rei}`,
                                     origem: `${t.origem}`,
@@ -357,18 +450,26 @@ module.exports = {
 
                             var prejuizo = ataque
 
-                            while(prejuizo >= 1){
-
-                                if(terr.tropas != 0 ){
-                                    terr.tropas--
-                                    prejuizo--
+                            if (!terr) {
+                                while (prejuizo >= 1) {
+                                    for (let q = 0; q < auxdef.length; q++) {
+                                        auxdef[q].tropas--
+                                        prejuizo--
+                                    }
                                 }
-                                for (let q = 0; q < auxdef.length; q++) {
-                                   auxdef[q].tropas--
-                                   prejuizo--                                    
+                            } else {
+                                while (prejuizo >= 1) {
+
+                                    if (terr.tropas != 0) {
+                                        terr.tropas--
+                                        prejuizo--
+                                    }
+                                    for (let q = 0; q < auxdef.length; q++) {
+                                        auxdef[q].tropas--
+                                        prejuizo--
+                                    }
                                 }
                             }
-
 
                             auxdef.forEach(function (n, i) {
                                 Territorio.update({
@@ -377,12 +478,14 @@ module.exports = {
                                     where: { localizacao: `${n.origem}` }
                                 });
                             })
+                            if (terr) {
+                                Territorio.update({
+                                    tropas: `${terr.tropas}`
+                                }, {
+                                    where: { localizacao: `${acoes[i].destino}` }
+                                });
+                            }
 
-                            Territorio.update({
-                                tropas: `${terr.tropas}`
-                            }, {
-                                where: { localizacao: `${acoes[i].destino}` }
-                            });
                         } else {
                             var novastropas = defesa - ataque
                             Territorio.update({
@@ -427,8 +530,6 @@ module.exports = {
                         });
 
                     }
-
-
                 }
 
                 var novarodada = parseInt(rodadaatual[0].rodada_atual) + 1;

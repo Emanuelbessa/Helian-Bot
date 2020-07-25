@@ -16,9 +16,9 @@ module.exports = {
             const RodadaAtual = Rodada(sequelize, Sequelize);
 
             let rodadaatual = await RodadaAtual.findAll({limit: 1, order: [[ 'createdAt', 'DESC' ]], attributes: ['id_rodada', 'rodada_atual'], raw: true });
-
+            var rodadacerta = parseInt(rodadaatual[0].rodada_atual);
            
-            let deletar = await Acao.destroy({ where: {rei: `${message.author.username}`, rodada: `${rodadaatual[0].rodada_atual}` }})
+            let deletar = await Acao.destroy({ where: {rei: `${message.author.username}`, rodada: `${rodadacerta}` }})
            
             if(deletar){               
                 return message.channel.send(`Todas as suas ações da rodada atual foram deletadas`);
@@ -30,12 +30,11 @@ module.exports = {
             const RodadaAtual = Rodada(sequelize, Sequelize);
 
             let rodadaatual = await RodadaAtual.findAll({limit: 1, order: [[ 'createdAt', 'DESC' ]], attributes: ['id_rodada', 'rodada_atual'], raw: true });
-
+            var rodadacerta = parseInt(rodadaatual[0].rodada_atual);
            
-            let ver = await Acao.findAll({ where: {rei: `${message.author.username}` }})
+            let ver = await Acao.findAll({ where: {rei: `${message.author.username}`, rodada: `${rodadacerta}` }})
             console.log(ver);
-            ({ where: { rei: `${message.author.username}`, rodada: `${rodadaatual[0].rodada_atual}`}, attributes: ['nome_acao', 'tropas', 'origem', 'destino'], raw: true });
-
+        
             if(ver){               
 
             message.channel.send(`Suas ações da rodada atual são:\n`);

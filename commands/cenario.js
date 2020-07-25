@@ -22,7 +22,11 @@ module.exports = {
 
             var nomes = ""
 
-            todosterritorios.forEach(function (p, i) {
+            var filtrados = todosterritorios.filter(function(a){
+                return a.rei == reinos[i].rei
+            })
+
+            filtrados.forEach(function (p, i) {
                 nomes = nomes + " " + "- "+  p.localizacao 
             })
 

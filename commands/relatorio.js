@@ -33,18 +33,25 @@ module.exports = {
         var rodadacerta = parseInt(rodadaatual[0].rodada_atual) - 1;
         let seurelatorio = await Relatorio.findAll({ where: { rei: `${message.author.username}`, rodada: rodadacerta }, attributes: ['origem', 'rei', 'destino', 'mensagem', 'rodada'], raw: true });
 
+        console.log(rodadaatual[0].rodada_atual);
+        console.log(rodadacerta);
+        console.log(seurelatorio);
+        console.log(seurelatorio.length);
+
 
 
         if (seurelatorio.length >= 1) {
             message.channel.send(`Meu Rei ${message.author.username}, estes são os relatórios desta rodada:`);
+            
             for (var i = 0; i < seurelatorio.length; i++) {
-
+                
                 var mensagem = ""
 
                 var tipo1 = seurelatorio.filter(function (a) {
-                    return a.mensagem = "1"
+                    return a.mensagem == "1"
                 })
-                if (tipo1.length >= 1) {
+                console.log(tipo1)
+                if (tipo1.length >= 1) {                  
                     var msg1a = "Fomos informados que os nossos ataques à: "
                     var msg1b = " foram um sucesso pois não havia resistência\n"
                     var locs1 = ""
@@ -54,8 +61,9 @@ module.exports = {
                     mensagem = mensagem + msg1a + locs1 + msg1b
                 }
 
+
                 var tipo2 = seurelatorio.filter(function (a) {
-                    return a.mensagem = "2"
+                    return a.mensagem == "2"
                 })
                 if (tipo2.length >= 1) {
                     var msg1a = "Os ataque que fizemos em: "
@@ -68,7 +76,7 @@ module.exports = {
                 }
 
                 var tipo3 = seurelatorio.filter(function (a) {
-                    return a.mensagem = "3"
+                    return a.mensagem == "3"
                 })
                 if (tipo3.length >= 1) {
                     var msg1a = "Os ataque que fizemos em: "
@@ -81,7 +89,7 @@ module.exports = {
                 }
 
                 var tipo4 = seurelatorio.filter(function (a) {
-                    return a.mensagem = "4"
+                    return a.mensagem == "4"
                 })
                 if (tipo4.length >= 1) {
                     var msg1a = "Os ataque que fizemos em: "
@@ -94,7 +102,7 @@ module.exports = {
                 }
 
                 var tipo5 = seurelatorio.filter(function (a) {
-                    return a.mensagem = "5"
+                    return a.mensagem == "5"
                 })
                 if (tipo5.length >= 1) {
                     var msg1a = "Os ataque que fizemos em: "
@@ -107,7 +115,7 @@ module.exports = {
                 }
 
                 var tipo6 = seurelatorio.filter(function (a) {
-                    return a.mensagem = "6"
+                    return a.mensagem == "6"
                 })
                 if (tipo6.length >= 1) {
                     var msg1a = "Nossos territórios em: "
@@ -120,7 +128,7 @@ module.exports = {
                 }
 
                 var tipo7 = seurelatorio.filter(function (a) {
-                    return a.mensagem = "7"
+                    return a.mensagem == "7"
                 })
                 if (tipo7.length >= 1) {
                     var msg1a = "Fomos atacados e não resistimos nos territórios: "
@@ -133,7 +141,7 @@ module.exports = {
                 }
 
                 var tipo8 = seurelatorio.filter(function (a) {
-                    return a.mensagem = "8"
+                    return a.mensagem == "8"
                 })
                 if (tipo8.length >= 1) {
                     var msg1a = "Foram vistos exércitos de mais de uma nação marchando à: "
@@ -146,7 +154,7 @@ module.exports = {
                 }
 
                 var tipo9 = seurelatorio.filter(function (a) {
-                    return a.mensagem = "9"
+                    return a.mensagem == "9"
                 })
                 if (tipo9.length >= 1) {
                     var msg1a = "Foram vistos exércitos de uma nação marchando em direção à: "
@@ -159,7 +167,7 @@ module.exports = {
                 }
 
                 var tipo10 = seurelatorio.filter(function (a) {
-                    return a.mensagem = "10"
+                    return a.mensagem == "10"
                 })
                 if (tipo10.length >= 1) {
                     var msg1a = "Nossas tentativas de apoio em: "
@@ -172,7 +180,7 @@ module.exports = {
                 }
 
                 var tipo11 = seurelatorio.filter(function (a) {
-                    return a.mensagem = "11"
+                    return a.mensagem == "11"
                 })
                 if (tipo11.length >= 1) {
                     var msg1a = "Nossos apoios em: "
@@ -185,7 +193,7 @@ module.exports = {
                 }
 
                 var tipo12 = seurelatorio.filter(function (a) {
-                    return a.mensagem = "12"
+                    return a.mensagem == "12"
                 })
                 if (tipo12.length >= 1) {
                     var msg1a = "Nossos apoios em: "
@@ -198,7 +206,7 @@ module.exports = {
                 }
 
                 var tipo13 = seurelatorio.filter(function (a) {
-                    return a.mensagem = "13"
+                    return a.mensagem == "13"
                 })
                 if (tipo13.length >= 1) {
                     var msg1a = "Fomos apoiados em: "
@@ -210,6 +218,8 @@ module.exports = {
                     mensagem = mensagem + msg1a + locs1 + msg1b
                 }
             }
+
+            return message.channel.send(`${mensagem}`);
 
         } else {
             return message.channel.send(`Você não agiu e não foi atacado. Não possuimos relatorio para você`);

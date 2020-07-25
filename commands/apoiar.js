@@ -12,8 +12,9 @@ module.exports = {
     async execute(message, args) {
         const { commands } = message.client;
         if (args.length != 3) {
+            console.log(args.length);
             return message.channel.send(`Você utilizou esse comando de forma incorreta, ${message.author}! Digite:!apoiar origem ataque/defesa destino`);
-        } else if (args[0] == 'ataque' || args[0] == 'defesa') {
+        } else if (args[1] == 'ataque' || args[1] == 'defesa') {
 
             const intencao = args[1].toLowerCase();
             const origem = args[0].toLowerCase();

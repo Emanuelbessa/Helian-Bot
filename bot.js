@@ -3,7 +3,7 @@
 //essa estrutura imaginem uma importação
 const fs = require('fs');
 const Discord = require('discord.js');
-const { prefix, token } = require('./config.json');
+const { prefix, token, prefix2 } = require('./config.json');
 const Sequelize = require('sequelize');
 const config = require('./database');
 
@@ -38,6 +38,11 @@ client.once('ready', () => {
 
 
 client.on('message', async message => {
+  if(message.content.startsWith(prefix2)){
+
+  client.commands.get(command).execute(message, args);
+
+  }
   if (!message.content.startsWith(prefix) || message.author.bot) return;
 
   const args = message.content.slice(prefix.length).split(/ +/);
