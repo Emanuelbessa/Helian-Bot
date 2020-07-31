@@ -22,7 +22,7 @@ module.exports = {
             const Rodada = Rodadas(sequelize, Sequelize);
 
             let rodadaatual = await Rodada.findAll({ limit: 1, order: [['createdAt', 'DESC']], attributes: ['id_rodada', 'rodada_atual'], raw: true });
-            let acoes = await Acao.findAll({ where: { nome_acao: ['atacar', 'apoiar'], rodada: `${rodadaatual[0].rodada_atual}` }, attributes: ['id_acao', 'nome_acao', 'apoio', 'tropas', 'rei', 'origem', 'destino'], raw: true });
+            var acoes = await Acao.findAll({ where: { nome_acao: ['atacar', 'apoiar'], rodada: `${rodadaatual[0].rodada_atual}` }, attributes: ['id_acao', 'nome_acao', 'apoio', 'tropas', 'rei', 'origem', 'destino'], raw: true });
 
             var ATACANTES = [];
             var DEFENSORES = [];
@@ -47,8 +47,6 @@ module.exports = {
             12. Apoios Mal sucedidos
             13. Apoiado
             */
-
-            console.log(acoes);
 
             for (var i = 0; i < acoes.length; i++) {
 
@@ -91,12 +89,12 @@ module.exports = {
                 }
 
             }
+            console.log("Ponto 1");
             // Removendo ações invalidadas pelo motivo A do Array de acoes
             acoes = acoes.filter(function (el, i) {
                 return MotivoA.indexOf(el) < 0
             })
-
-            console.log(acoes);
+            console.log("Ponto 2");
 
             var ATACANTES = [];
             var DEFENSORES = [];
@@ -115,8 +113,6 @@ module.exports = {
                     APOIADO.push(acoes[i].destino);
                 }
             }
-
-            console.log(acoes);
 
             // Começando fase de testes do Motivo B
             let findDuplicates = arr => arr.filter((item, index) => arr.indexOf(item) != index)
@@ -153,17 +149,18 @@ module.exports = {
                 }
 
             }
+            console.log("Ponto 3");
             // Removendo ações invalidadas pelo motivo B do Array de acoes
             acoes = acoes.filter(function (el, i) {
                 return MotivoB.indexOf(el) < 0
             })
+            console.log("Ponto 4");
 
 
             var app = acoes.filter(function (a) {
                 return a.nome_acao == 'atacar'
             })
 
-            console.log(app);
             //Testando quem vai cair no Motivo C
             for (var i = 0; i < app.length; i++) {
                 for (var k = 0; k < APOIADOR.length; k++) {
@@ -183,12 +180,12 @@ module.exports = {
                     rodada: `${rodadaatual[0].rodada_atual}`
                 });
             }
+            console.log("Ponto 5");
             // Removendo ações invalidadas pelo motivo C do Array de acoes
             acoes = acoes.filter(function (el) {
                 return MotivoC.indexOf(el) < 0;
             });
-
-            console.log("aqui 2");
+            console.log("Ponto 6");
 
             var apoiadores = acoes.filter(function (a) {
                 return a.nome_acao == 'apoiar'
@@ -198,7 +195,7 @@ module.exports = {
             var DEFENSORES = [];
             var APOIADOR = [];
             var APOIADO = [];
-
+            console.log("Ponto 7");
             for (var i = 0; i < acoes.length; i++) {
 
                 if (acoes[i].nome_acao == 'atacar') {
@@ -212,13 +209,13 @@ module.exports = {
                 }
             }
 
+            console.log("Ponto 8");
             // Se o destino do apoio não é origem ou destino de um ataque, bem sucedido / apoiado
             // A conquista PVE deve ser parte do for do PVP, pois existe a possiblidade de alguém apoiar o território vazio
 
             for (let i = 0; i < apoiadores.length; i++) {
                 if (!DEFENSORES.includes(apoiadores[i].destino)) {
                     let sup = await Territorio.findOne({ where: { localizacao: `${apoiadores[i].destino}` }, attributes: ['localizacao', 'rei'], raw: true });
-                    
                     Relatorio.create({
                         rei: `${apoiadores[i].rei}`,
                         origem: `${apoiadores[i].origem}`,
@@ -226,7 +223,6 @@ module.exports = {
                         mensagem: '11',
                         rodada: `${rodadaatual[0].rodada_atual}`
                     });
-
                     Relatorio.create({
                         rei: `${sup.rei}`,
                         origem: `${apoiadores[i].origem}`,
@@ -234,18 +230,18 @@ module.exports = {
                         mensagem: '13',
                         rodada: `${rodadaatual[0].rodada_atual}`
                     });
-
                 }
             }
             var atacantes = acoes.filter(function (a) {
                 return a.nome_acao == 'atacar'
             });
             //
-
+            console.log("Ponto 9");
+            var testando = await Territorio.findOne({ where: { localizacao: `d3` }, attributes: ['localizacao', 'tropas', 'rei'], raw: true });
             // PVPs que de fato aconteceram
-            for (var i = 0; i < acoes.length; i++) {
-                if (acoes[i].nome_acao === 'atacar') {
-                    let terr = await Territorio.findOne({ where: { localizacao: `${acoes[i].destino}` }, attributes: ['localizacao', 'tropas', 'rei'], raw: true });
+            for (let i = 0; i < acoes.length; i++) {
+                if (acoes[i].nome_acao == 'atacar') {
+                    var terr = await Territorio.findOne({ where: { localizacao: acoes[i].destino }, attributes: ['localizacao', 'tropas', 'rei'], raw: true });
 
                     var ataque = acoes[i].tropas
                     if (terr) {
@@ -377,15 +373,19 @@ module.exports = {
 
                             var prejuizo = defesa
 
+                            console.log('ponto 10');
                             while (prejuizo >= 1) {
 
                                 if (acoes[i].tropas != 0) {
                                     acoes[i].tropas--
                                     prejuizo--
                                 }
+
                                 for (let q = 0; q < auxatq.length; q++) {
-                                    auxatq[q].tropas--
-                                    prejuizo--
+                                    if (prejuizo >= 1 && auxatq[q].tropas >= 1) {
+                                        auxatq[q].tropas--
+                                        prejuizo--
+                                    }
                                 }
                             }
                             //Pode melhorar performance, att mesmo com def = 0
@@ -465,8 +465,11 @@ module.exports = {
                                         prejuizo--
                                     }
                                     for (let q = 0; q < auxdef.length; q++) {
-                                        auxdef[q].tropas--
-                                        prejuizo--
+                                        if (prejuizo >= 1 && auxdef[q].tropas >= 1) {
+                                            auxdef[q].tropas--
+                                            prejuizo--
+
+                                        }
                                     }
                                 }
                             }
@@ -531,18 +534,17 @@ module.exports = {
 
                     }
                 }
-
-                var novarodada = parseInt(rodadaatual[0].rodada_atual) + 1;
-                Rodada.update({
-                    rodada_atual: novarodada,
-                }, {
-                    where: { id_rodada: 1 }
-                });
-
-                return message.channel.send(`Rodada encerrada, utilize os comandos !cenario e !relatorio para maiores informações`);
-
-                // IMPLEMENTAÇÃO SEM FAZER - RELATORIOS DE APOIO QUANDO N EXISTEM ATAQUES
             }
+            var novarodada = parseInt(rodadaatual[0].rodada_atual) + 1;
+            Rodada.update({
+                rodada_atual: novarodada,
+            }, {
+                where: { id_rodada: 1 }
+            });
+
+            return message.channel.send(`Rodada encerrada, utilize os comandos !cenario e !relatorio para maiores informações`);
+
+            // IMPLEMENTAÇÃO SEM FAZER - RELATORIOS DE APOIO QUANDO N EXISTEM ATAQUES
         }
-    },
-};
+    }
+}
