@@ -132,7 +132,7 @@ module.exports = {
                 })
                 if (tipo7.length >= 1) {
                     var msg1a = "Fomos atacados e não resistimos nos territórios: "
-                    var msg1b = " infelizmente tivemos que abandoná-los.\n"
+                    var msg1b = " infelizmente tivemos que abandoná-lo(s).\n"
                     var locs1 = ""
                     tipo7.forEach(function (p, i) {
                         locs1 = locs1 + " " + p.destino
@@ -171,7 +171,7 @@ module.exports = {
                 })
                 if (tipo10.length >= 1) {
                     var msg1a = "Nossas tentativas de apoio em: "
-                    var msg1b = " não aconteceram pois nossas tropas tiveram que ficar para lutar\n"
+                    var msg1b = " não aconteceram, pois nossas tropas tiveram que ficar para lutar\n"
                     var locs1 = ""
                     tipo10.forEach(function (p, i) {
                         locs1 = locs1 + " " + p.destino
