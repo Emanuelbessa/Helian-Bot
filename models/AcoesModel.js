@@ -9,6 +9,7 @@ const Sequelize = require('sequelize');
     nome_acao: Sequelize.STRING,
     apoio: Sequelize.STRING,
     tropas: Sequelize.INTEGER,
+    arqueiros: Sequelize.INTEGER,
     rei: Sequelize.STRING,
     origem: Sequelize.STRING,
     destino: Sequelize.STRING,

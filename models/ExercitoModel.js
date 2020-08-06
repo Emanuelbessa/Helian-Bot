@@ -1,15 +1,14 @@
 const Sequelize = require('sequelize');
  module.exports = (sequelize, type) => {
-    return sequelize.define('territorios', {
-      id_territorio: {
+    return sequelize.define('exercitos', {
+      id_exercito: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
       primaryKey: true
     },
+    reino: Sequelize.STRING,
     localizacao: Sequelize.STRING,
-    nome_territorio: Sequelize.STRING,
-    rei: Sequelize.STRING,
-    tropas: Sequelize.INTEGER,
-    arqueiros: Sequelize.INTEGER,
-  });
+    tipo_tropa: Sequelize.STRING,
+    quantidade: Sequelize.INTEGER,
+    });
   }
