@@ -3,6 +3,7 @@ const Reinos = require('../models/ReinoModel.js');
 const Territorios = require('../models/TerritorioModel.js');
 const Relatorios = require('../models/RelatorioModel.js');
 const Rodadas = require('../models/RodadaModel.js');
+const coletadeouro = require('./funcoes.js');
 const Sequelize = require('sequelize');
 const config = require('../database');
 const sequelize = new Sequelize(config);
@@ -23,6 +24,8 @@ module.exports = {
 
             let rodadaatual = await Rodada.findAll({ limit: 1, order: [['createdAt', 'DESC']], attributes: ['id_rodada', 'rodada_atual'], raw: true });
             var acoes = await Acao.findAll({ where: { nome_acao: ['atacar', 'apoiar'], rodada: `${rodadaatual[0].rodada_atual}` }, attributes: ['id_acao', 'nome_acao', 'apoio', 'tropas', 'rei', 'origem', 'destino'], raw: true });
+            var coletas = await Acao.findAll({ where: { nome_acao: ['coletar'], rodada: `${rodadaatual[0].rodada_atual}` }, attributes: ['id_acao', 'nome_acao', 'rei', 'origem'], raw: true });
+
 
             var ATACANTES = [];
             var DEFENSORES = [];
@@ -534,6 +537,17 @@ module.exports = {
 
                     }
                 }
+            }
+            //Dando a grana das coletas
+            for (let i = 0; i < coletas.length; i++) {
+                let reinos = await Reino.findAll({ order: [['rei', 'DESC']], attributes: ['nome_reino', 'rei'] });
+                let todosterritorios = await Territorio.findAll({ order: [['rei', 'DESC']], attributes: ['localizacao', 'rei', 'nome_territorio'], where: { rei: `${coletas[i].rei}` }, raw: true });
+                let territorio = await Territorio.findOne({ where: { localizacao: `${coletas[i].origem}` }, attributes: ['localizacao', 'tropas', 'rei'], raw: true });
+
+                var ouroganho = coletadeouro.ourocoletado(reinos.length, todosterritorios.length)
+
+                Reino.increment('ouro', { by: ouroganho, where: { rei: `${territorio.rei}` } });
+
             }
             var novarodada = parseInt(rodadaatual[0].rodada_atual) + 1;
             Rodada.update({
