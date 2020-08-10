@@ -12,7 +12,7 @@ module.exports = {
         const Territorio = Territorios(sequelize, Sequelize);
         const Reino = Reinos(sequelize, Sequelize);
 
-        let temterritorio = await Territorio.findAll({ where: { rei: `${message.author.username}` }, attributes: ['localizacao', 'rei', 'nome_territorio', 'tropas'], raw: true });
+        let temterritorio = await Territorio.findAll({ where: { rei: `${message.author.username}` }, attributes: ['localizacao', 'rei', 'nome_territorio', 'tropas', 'arqueiros'], raw: true });
         let reino = await Reino.findOne({ where: { rei: `${message.author.username}` }, attributes: ['ouro', 'rei', 'nome_reino'], raw: true });
 
         if (temterritorio.length >= 1 && reino) {
@@ -21,7 +21,7 @@ module.exports = {
 
             for (var i = 0; i < temterritorio.length; i++) {
 
-                message.channel.send(`Localização: **${temterritorio[i].localizacao}**; Tropas no território: **${temterritorio[i].tropas}**\n`);
+                message.channel.send(`Localização: **${temterritorio[i].localizacao}**; Soldados no território: **${temterritorio[i].tropas}**; Arqueiros no território: **${temterritorio[i].arqueiros}**\n`);
             }
         } else {
             return message.channel.send(`Você não possui um Reino ou territorios`);

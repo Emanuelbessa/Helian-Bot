@@ -47,6 +47,7 @@ module.exports = {
                     nome_acao: "apoiar",
                     apoio: `${intencao}`,
                     tropas: `${dono.dataValues.tropas}`,
+                    arqueiros: `${dono.dataValues.arqueiros}`,
                     origem: `${origem}`,
                     destino: `${destino}`,
                     rei: `${message.author.username}`,

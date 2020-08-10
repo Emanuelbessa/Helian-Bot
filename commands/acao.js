@@ -40,7 +40,7 @@ module.exports = {
             message.channel.send(`Suas ações da rodada atual são:\n`);
             for(var i = 0;i < ver.length; i++){
                 
-                message.channel.send(`Ação: **${ver[i].nome_acao}**; Tropas: **${ver[i].tropas}**; Origem: **${ver[i].origem}**; Destino: **${ver[i].destino}**\n`);
+                message.channel.send(`Ação: **${ver[i].nome_acao}**; Tropas: **${ver[i].tropas}**; Arqueiros: **${ver[i].arqueiros}**; Origem: **${ver[i].origem}**; Destino: **${ver[i].destino}**\n`);
                 }
                 
             } 

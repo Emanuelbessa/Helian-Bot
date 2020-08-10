@@ -23,7 +23,7 @@ module.exports = {
             const Rodada = Rodadas(sequelize, Sequelize);
 
             let rodadaatual = await Rodada.findAll({ limit: 1, order: [['createdAt', 'DESC']], attributes: ['id_rodada', 'rodada_atual'], raw: true });
-            var acoes = await Acao.findAll({ where: { nome_acao: ['atacar', 'apoiar'], rodada: `${rodadaatual[0].rodada_atual}` }, attributes: ['id_acao', 'nome_acao', 'apoio', 'tropas', 'rei', 'origem', 'destino'], raw: true });
+            var acoes = await Acao.findAll({ where: { nome_acao: ['atacar', 'apoiar'], rodada: `${rodadaatual[0].rodada_atual}` }, attributes: ['id_acao', 'nome_acao', 'apoio', 'tropas', 'arqueiros', 'rei', 'origem', 'destino'], raw: true });
             var coletas = await Acao.findAll({ where: { nome_acao: ['coletar'], rodada: `${rodadaatual[0].rodada_atual}` }, attributes: ['id_acao', 'nome_acao', 'rei', 'origem'], raw: true });
 
 
@@ -163,15 +163,19 @@ module.exports = {
             var app = acoes.filter(function (a) {
                 return a.nome_acao == 'atacar'
             })
-
+            var apoios = acoes.filter(function (a) {
+                return a.nome_acao == 'apoiar'
+            })
+            console.log("Ponto teste");
             //Testando quem vai cair no Motivo C
             for (var i = 0; i < app.length; i++) {
-                for (var k = 0; k < APOIADOR.length; k++) {
-                    if (app[i].destino == APOIADOR[k]) {
-                        MotivoC.push(app[i])
+                for (var k = 0; k < apoios.length; k++) {
+                    if (app[i].destino == apoios[k].origem) {
+                        MotivoC.push(apoios[k])
                     }
                 }
             }
+            console.log("Ponto teste2");
             // Criando os Relatórios do Motivo C
             for (let i = 0; i < MotivoC.length; i++) {
                 // Tentativa de Apoio Falha - Fui atacado
@@ -226,13 +230,16 @@ module.exports = {
                         mensagem: '11',
                         rodada: `${rodadaatual[0].rodada_atual}`
                     });
-                    Relatorio.create({
-                        rei: `${sup.rei}`,
-                        origem: `${apoiadores[i].origem}`,
-                        destino: `${apoiadores[i].destino}`,
-                        mensagem: '13',
-                        rodada: `${rodadaatual[0].rodada_atual}`
-                    });
+                    if (sup) {
+                        Relatorio.create({
+                            rei: `${sup.rei}`,
+                            origem: `${apoiadores[i].origem}`,
+                            destino: `${apoiadores[i].destino}`,
+                            mensagem: '13',
+                            rodada: `${rodadaatual[0].rodada_atual}`
+                        });
+                    }
+
                 }
             }
             var atacantes = acoes.filter(function (a) {
@@ -240,15 +247,16 @@ module.exports = {
             });
             //
             console.log("Ponto 9");
-            var testando = await Territorio.findOne({ where: { localizacao: `d3` }, attributes: ['localizacao', 'tropas', 'rei'], raw: true });
+
+
             // PVPs que de fato aconteceram
             for (let i = 0; i < acoes.length; i++) {
                 if (acoes[i].nome_acao == 'atacar') {
-                    var terr = await Territorio.findOne({ where: { localizacao: acoes[i].destino }, attributes: ['localizacao', 'tropas', 'rei'], raw: true });
+                    var terr = await Territorio.findOne({ where: { localizacao: acoes[i].destino }, attributes: ['localizacao', 'tropas', 'arqueiros', 'rei'], raw: true });
 
-                    var ataque = acoes[i].tropas
+                    var ataque = acoes[i].tropas + acoes[i].arqueiros
                     if (terr) {
-                        var defesa = terr.tropas
+                        var defesa = terr.tropas + (terr.arqueiros * 3)
                     } else {
                         var defesa = 0
                     }
@@ -270,6 +278,10 @@ module.exports = {
                             auxatq.forEach(function (t, indice) {
                                 a = a + t.tropas
                             })
+                            //add força dos arqueiros no atk (1)
+                            auxatq.forEach(function (t, indice) {
+                                a = a + t.arqueiros
+                            })
 
                             ataque = ataque + a
                             apoioatk = true
@@ -279,6 +291,10 @@ module.exports = {
                             var d = 0
                             auxdef.forEach(function (t, indice) {
                                 d = d + t.tropas
+                            })
+
+                            auxdef.forEach(function (t, indice) {
+                                d = d + (t.tropas * 3)
                             })
 
                             defesa = defesa + d
@@ -320,6 +336,7 @@ module.exports = {
                                 rodada: `${rodadaatual[0].rodada_atual}`
                             });
                         }
+                        //Criando o Relatório para as pessoas que defenderam e zerando suas tropas (lado perdedor)
                         if (apoiodef) {
                             auxdef.forEach(function (t, indice) {
                                 if (terr) {
@@ -341,20 +358,23 @@ module.exports = {
                             })
                             auxdef.forEach(function (v, i) {
                                 Territorio.update({
-                                    tropas: `0`
+                                    tropas: `0`,
+                                    arqueiros: `0`
+
                                 }, {
                                     where: { localizacao: `${v.origem}` }
                                 });
                             })
                         }
-
+                        //Mudando o Rei do território para o nome do rei vencedor
                         Territorio.update({
                             rei: `${acoes[i].rei}`,
-                            tropas: `0`
+                            tropas: `0`,
+                            arqueiros: `0`,
                         }, {
                             where: { localizacao: `${acoes[i].destino}` }
                         });
-
+                        //Criando o Relatório para as pessoas que ajudaram a atacar e reduzindo suas tropas (lado vencedor)
                         if (apoioatk) {
                             auxatq.forEach(function (t, indice) {
                                 Relatorio.create({
@@ -382,11 +402,21 @@ module.exports = {
                                 if (acoes[i].tropas != 0) {
                                     acoes[i].tropas--
                                     prejuizo--
+                                } else if (acoes[i].arqueiros != 0) {
+                                    acoes[i].arqueiros--
+                                    prejuizo--
+                                    prejuizo--
+                                    prejuizo--
                                 }
 
                                 for (let q = 0; q < auxatq.length; q++) {
                                     if (prejuizo >= 1 && auxatq[q].tropas >= 1) {
                                         auxatq[q].tropas--
+                                        prejuizo--
+                                    } else if (prejuizo >= 1 && auxatq[q].arqueiros >= 1) {
+                                        auxatq[q].arqueiros--
+                                        prejuizo--
+                                        prejuizo--
                                         prejuizo--
                                     }
                                 }
@@ -394,27 +424,42 @@ module.exports = {
                             //Pode melhorar performance, att mesmo com def = 0
                             auxatq.forEach(function (n, i) {
                                 Territorio.update({
-                                    tropas: `${n.tropas}`
+                                    tropas: `${n.tropas}`,
+                                    arqueiros: `${n.arqueiros}`
                                 }, {
                                     where: { localizacao: `${n.origem}` }
                                 });
                             })
 
                             Territorio.update({
-                                tropas: `${acoes[i].tropas}`
+                                tropas: `${acoes[i].tropas}`,
+                                arqueiros: `${acoes[i].arqueiros}`
                             }, {
                                 where: { localizacao: `${acoes[i].origem}` }
                             });
                         } else {
-                            var novastropas = ataque - defesa
+                            //Atualizando tropas do atacante, nesse caso, não houve apoios
+                            var novastropas = defesa
+
+                            while (novastropas >= 1) {
+                                if (acoes[i].tropas != 0) {
+                                    acoes[i].tropas--
+                                    novastropas--
+                                } else if (acoes[i].arqueiros != 0) {
+                                    acoes[i].arqueiros--
+                                    novastropas--
+                                }
+                            }
+
                             Territorio.update({
-                                tropas: `${novastropas}`
+                                tropas: `${acoes[i].tropas}`,
+                                arqueiros: `${acoes[i].arqueiros}`
                             }, {
                                 where: { localizacao: `${acoes[i].origem}` }
                             });
                         }
                     } else {
-                        // defesa ganhou
+                        //Criando o Relatório para as pessoas que defenderam (lado vencedor)
                         Relatorio.create({
                             rei: `${acoes[i].rei}`,
                             origem: `${acoes[i].origem}`,
@@ -431,6 +476,7 @@ module.exports = {
                                 rodada: `${rodadaatual[0].rodada_atual}`
                             });
                         }
+                        //Criando o Relatório para as pessoas que ajudaram a defenderam e reduzindo suas tropas
                         if (apoiodef) {
                             auxdef.forEach(function (t, indice) {
                                 if (terr) {
@@ -452,26 +498,43 @@ module.exports = {
                             })
 
                             var prejuizo = ataque
-
+                            //
                             if (!terr) {
                                 while (prejuizo >= 1) {
                                     for (let q = 0; q < auxdef.length; q++) {
-                                        auxdef[q].tropas--
-                                        prejuizo--
+
+                                        if (auxdef[q].tropas != 0) {
+                                            auxdef[q].tropas--
+                                            prejuizo--
+                                        } else if (auxdef[q].arqueiros != 0) {
+                                            auxdef[q].arqueiros--
+                                            prejuizo--
+                                            prejuizo--
+                                            prejuizo--
+                                        }
                                     }
                                 }
                             } else {
                                 while (prejuizo >= 1) {
-
                                     if (terr.tropas != 0) {
                                         terr.tropas--
                                         prejuizo--
+                                    } else if (terr.arqueiros != 0) {
+                                        auxdef[q].arqueiros--
+                                        prejuizo--
+                                        prejuizo--
+                                        prejuizo--
                                     }
+
                                     for (let q = 0; q < auxdef.length; q++) {
                                         if (prejuizo >= 1 && auxdef[q].tropas >= 1) {
                                             auxdef[q].tropas--
                                             prejuizo--
-
+                                        } else if (prejuizo >= 1 && auxdef[q].arqueiros >= 1) {
+                                            auxdef[q].arqueiros--
+                                            prejuizo--
+                                            prejuizo--
+                                            prejuizo--
                                         }
                                     }
                                 }
@@ -479,25 +542,40 @@ module.exports = {
 
                             auxdef.forEach(function (n, i) {
                                 Territorio.update({
-                                    tropas: `${n.tropas}`
+                                    tropas: `${n.tropas}`,
+                                    arqueiros: `${n.arqueiros}`
                                 }, {
                                     where: { localizacao: `${n.origem}` }
                                 });
                             })
                             if (terr) {
                                 Territorio.update({
-                                    tropas: `${terr.tropas}`
+                                    tropas: `${terr.tropas}`,
+                                    arqueiros: `${terr.arqueiros}`
                                 }, {
                                     where: { localizacao: `${acoes[i].destino}` }
                                 });
                             }
 
                         } else {
-                            var novastropas = defesa - ataque
+                            var novastropas = ataque
+
+                            while (novastropas >= 1) {
+                                if (terr.tropas != 0) {
+                                    terr.tropas--
+                                    novastropas--
+                                } else if (terr.arqueiros != 0) {
+                                    terr.arqueiros--
+                                    novastropas--
+                                    novastropas--
+                                    novastropas--
+                                }
+                            }
                             Territorio.update({
-                                tropas: `${novastropas}`
+                                tropas: `${terr.tropas}`,
+                                arqueiros: `${terr.arqueiros}`
                             }, {
-                                where: { localizacao: `${acoes[i].destino}` }
+                                where: { localizacao: `${terr.destino}` }
                             });
                         }
 
@@ -519,22 +597,20 @@ module.exports = {
                                 });
                             })
                             auxatq.forEach(function (n, i) {
-
                                 Territorio.update({
-                                    tropas: `0`
+                                    tropas: `0`,
+                                    arqueiros: `0`
                                 }, {
                                     where: { localizacao: `${n.origem}` }
                                 });
                             })
-
                         }
-
                         Territorio.update({
-                            tropas: `0`
+                            tropas: `0`,
+                            arqueiros: `0`
                         }, {
                             where: { localizacao: `${acoes[i].origem}` }
                         });
-
                     }
                 }
             }

@@ -43,6 +43,7 @@ module.exports = {
                 Acao.create({
                     nome_acao: "atacar",
                     tropas: `${dono.dataValues.tropas}`,
+                    arqueiros: `${dono.dataValues.arqueiros}`,
                     origem: `${origem}`,
                     destino: `${destino}`,
                     rei: `${message.author.username}`,
