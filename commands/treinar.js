@@ -15,7 +15,7 @@ module.exports = {
             return message.channel.send(`Você utilizou esse comando de forma incorreta, ${message.author}!\nPara treinar corretamente digite:\n!treinar tipodatropa quantidadedetropas localização`);
         } else {
 
-            var Tipos = ["sol", "arq"]
+            var Tipos = ["sol", "arq", "a", "arqueiro", "s", "soldado"]
 
             const tipotropa = args[0].toLowerCase();
             const ntropas = args[1].toLowerCase();
@@ -46,7 +46,7 @@ module.exports = {
             //Check dono do território
             if (dono) {
                 //Check de ouro no reino para arqueiro
-                if (tipotropa === 'arq') {
+                if (tipotropa === "arq" || tipotropa === "a" || tipotropa === "arqueiro") {
                     var custototal = parseInt(ntropas) * 2
                     if (custototal <= reino.ouro) {
                         var novas = destino.arqueiros + parseInt(ntropas)
@@ -59,7 +59,7 @@ module.exports = {
                     }
                 }
                 //Check de ouro no reino para soldado
-                if (tipotropa === 'sol') {
+                if (tipotropa === "sol" || tipotropa === "s" || tipotropa === "soldado") {
                     var custototal = parseInt(ntropas)
                     if (custototal <= reino.ouro) {
                         var novas = destino.tropas + parseInt(ntropas)
