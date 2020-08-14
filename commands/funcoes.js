@@ -53,5 +53,24 @@ function ourocoletado(players, territorios) {
     return ouro
 }
 
+function adjacente2dist(xorigem, yorigem, xdestino, ydestino) {
+    var teste = parseInt(`${xdestino}${ydestino}`)
+    if (xorigem % 2 == 0) {
+      var ArrEven = [parseInt(`${xorigem - 2}${yorigem - 1}`), parseInt(`${xorigem - 2}${yorigem}`), parseInt(`${xorigem-2}${yorigem + 1}`), parseInt(`${xorigem-1}${yorigem - 2}`), parseInt(`${xorigem - 1}${yorigem - 1}`), parseInt(`${xorigem - 1}${yorigem}`), parseInt(`${xorigem - 1}${yorigem+1}`), parseInt(`${xorigem}${yorigem-2}`), parseInt(`${xorigem}${yorigem-1}`), parseInt(`${xorigem}${yorigem+1}`), parseInt(`${xorigem}${yorigem+2}`), parseInt(`${xorigem + 1}${yorigem-2}`), parseInt(`${xorigem + 1}${yorigem-1}`), parseInt(`${xorigem + 1}${yorigem}`), parseInt(`${xorigem + 1}${yorigem+1}`), parseInt(`${xorigem + 2}${yorigem-1}`), parseInt(`${xorigem + 2}${yorigem}`), parseInt(`${xorigem +2}${yorigem+1}`)]
+  
+      if (ArrEven.includes(teste)) {
+        return true
+      }
+    } else {
+      var ArrOdd = [parseInt(`${xorigem - 2}${yorigem - 1}`), parseInt(`${xorigem - 2}${yorigem}`), parseInt(`${xorigem-2}${yorigem + 1}`), parseInt(`${xorigem-1}${yorigem - 1}`), parseInt(`${xorigem - 1}${yorigem}`), parseInt(`${xorigem - 1}${yorigem+1}`), parseInt(`${xorigem - 1}${yorigem+2}`), parseInt(`${xorigem}${yorigem-2}`), parseInt(`${xorigem}${yorigem-1}`), parseInt(`${xorigem}${yorigem+1}`), parseInt(`${xorigem}${yorigem+2}`), parseInt(`${xorigem + 1}${yorigem-1}`), parseInt(`${xorigem + 1}${yorigem}`), parseInt(`${xorigem + 1}${yorigem+1}`), parseInt(`${xorigem + 1}${yorigem+2}`), parseInt(`${xorigem + 2}${yorigem-1}`), parseInt(`${xorigem + 2}${yorigem}`), parseInt(`${xorigem +2}${yorigem+1}`)]
+  
+      if (ArrOdd.includes(teste)) {
+        return true
+      }
+    }
+    return false
+  }
+
 module.exports.ourocoletado = ourocoletado;
 module.exports.adjacente = adjacente;
+module.exports.adjacente = adjacente2dist;
