@@ -29,7 +29,7 @@ module.exports = {
             let orig = await Mapa.findOne({ where: { nome_mapa: `${origem}` } });
             let dest = await Mapa.findOne({ where: { nome_mapa: `${destino}` } });
 
-
+            
             if(ataque){
                 return message.channel.send(`Já existe uma ação registrada para esse territorio, espere a rodada acabar`);
             }
@@ -38,6 +38,10 @@ module.exports = {
 
                 if (!adj.adjacente(orig.x, orig.y, dest.x, dest.y)) {
                     return message.channel.send(`Seu território não está adjacente ao território de destino, reveja sua ação`);
+                }
+
+                if(dono.tropas == 0 && dono.arqueiros == 0){
+                    return message.channel.send(`Seu território não possui tropas`);
                 }
                 
                 Acao.create({
