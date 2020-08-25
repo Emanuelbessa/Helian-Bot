@@ -1,15 +1,12 @@
 const Sequelize = require('sequelize');
  module.exports = (sequelize, type) => {
-    return sequelize.define('reinos', {
-      id_reino: {
+    return sequelize.define('barcos', {
+      id_barco: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
       primaryKey: true
     },
     nome_reino: Sequelize.STRING,
-    inicial_conquistado: Sequelize.INTEGER,
-    rei: Sequelize.STRING,
-    ouro: Sequelize.INTEGER,
-    custo_barco: Sequelize.INTEGER,
+    nome_mar: Sequelize.STRING,
     });
   }

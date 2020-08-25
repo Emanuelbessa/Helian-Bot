@@ -7,6 +7,7 @@ const Sequelize = require('sequelize');
       primaryKey: true
     },
     nome_mapa: Sequelize.STRING,
+    nome_mar: Sequelize.STRING,
     x: Sequelize.INTEGER,
     y: Sequelize.INTEGER,
     }, {
