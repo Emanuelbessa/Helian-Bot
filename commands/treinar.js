@@ -27,7 +27,6 @@ module.exports = {
             const Rodada = Rodadas(sequelize, Sequelize);
 
             let rodadaatual = await Rodada.findAll({ limit: 1, order: [['createdAt', 'DESC']], attributes: ['id_rodada', 'rodada_atual'], raw: true });
-
             let acao = await Acao.findOne({ where: { rei: `${message.author.username}`, origem: `${loc}`, rodada: `${rodadaatual[0].rodada_atual}` } });
             let dono = await Territorio.findOne({ where: { rei: `${message.author.username}`, localizacao: `${loc}` } });
             let destino = await Territorio.findOne({ where: { localizacao: `${loc}` } });
@@ -73,7 +72,6 @@ module.exports = {
             } else {
                 return message.channel.send(`Você não é o dono do território`)
             }
-
         }
     },
 };

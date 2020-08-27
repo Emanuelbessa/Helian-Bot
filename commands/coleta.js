@@ -39,9 +39,6 @@ module.exports = {
             } else {
                 return message.channel.send(`Você não é o dono do território`)
             }
-
-
-
         }
     }
 };

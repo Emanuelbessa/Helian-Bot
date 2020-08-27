@@ -17,7 +17,6 @@ module.exports = {
 
             let rodadaatual = await RodadaAtual.findAll({ limit: 1, order: [['createdAt', 'DESC']], attributes: ['id_rodada', 'rodada_atual'], raw: true });
             var rodadacerta = parseInt(rodadaatual[0].rodada_atual);
-
             let deletar = await Acao.destroy({ where: { rei: `${message.author.username}`, rodada: `${rodadacerta}` } })
 
             if (deletar) {
@@ -31,22 +30,17 @@ module.exports = {
 
             let rodadaatual = await RodadaAtual.findAll({ limit: 1, order: [['createdAt', 'DESC']], attributes: ['id_rodada', 'rodada_atual'], raw: true });
             var rodadacerta = parseInt(rodadaatual[0].rodada_atual);
-
             let ver = await Acao.findAll({ where: { rei: `${message.author.username}`, rodada: `${rodadacerta}` } })
-            console.log(ver);
 
             if (ver) {
-
                 message.channel.send(`Suas ações da rodada atual são:\n`);
+                
                 for (var i = 0; i < ver.length; i++) {
-
                     message.channel.send(`Ação: **${ver[i].nome_acao}**; Tropas: **${ver[i].tropas}**; Arqueiros: **${ver[i].arqueiros}**; Origem: **${ver[i].origem}**; Destino: **${ver[i].destino}**\n`);
                 }
-
             }
             message.channel.send(`Para apagar suas ações nesta rodada, digite !acao apagar`);
         } else {
-
             return message.channel.send(`Comando de ação usado de forma incorreta`);
         }
     }
