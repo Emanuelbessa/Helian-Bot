@@ -137,9 +137,42 @@ function randomMinMax(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
 }
 
+function mar_encontra_caminho(mar_origem, mar_destino, mares_controlados, relacao_adjacencia_mares) {
+    var caminhos = []
+    cont = 0
+
+    for (mar of relacao_adjacencia_mares[mar_origem]) {
+        if (mares_controlados.includes(mar)) {
+            var lista_vazia = []
+            caminhos.push(lista_vazia)
+            caminhos[cont].push(mar)
+            cont++
+        }
+    }
+    for (let i = 0; i < caminhos.length; i++) {
+        for (const mar_caminho of caminhos[i]) {
+            for (const mar_adjacente of relacao_adjacencia_mares[mar_caminho]) {
+                console.log('mar adjacente :', mar_adjacente);
+                if (!caminhos[i].includes(mar_adjacente) && mares_controlados.includes(mar_adjacente) && !caminhos[i].includes(mar_destino)) {
+                    caminhos[i].push(mar_adjacente)
+                    console.log(caminhos)
+                }
+            }
+        }
+    }
+    encontrou_caminho = false
+    for (const caminho of caminhos) {
+        if (caminho.includes(mar_destino)) {
+            encontrou_caminho = true
+        }
+    }
+    return encontrou_caminho
+}
+
 module.exports.ourocoletado = ourocoletado;
 module.exports.adjacente = adjacente;
 module.exports.adjacente = adjacente2dist;
 module.exports.territoriosIniciais = territoriosIniciais;
 module.exports.numerosParaLetras = numerosParaLetras;
 module.exports.randomMinMax = randomMinMax;
+module.exports.mar_encontra_caminho = mar_encontra_caminho;
