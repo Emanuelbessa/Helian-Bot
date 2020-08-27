@@ -6,6 +6,7 @@ const Sequelize = require('sequelize');
       autoIncrement: true,
       primaryKey: true
     },
+    nome_rei: Sequelize.STRING,
     nome_reino: Sequelize.STRING,
     nome_mar: Sequelize.STRING,
     });

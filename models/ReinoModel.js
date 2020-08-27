@@ -11,5 +11,6 @@ const Sequelize = require('sequelize');
     rei: Sequelize.STRING,
     ouro: Sequelize.INTEGER,
     custo_barco: Sequelize.INTEGER,
+    barcos_ocupados: Sequelize.INTEGER,
     });
   }
