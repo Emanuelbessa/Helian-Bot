@@ -6,7 +6,6 @@ const Barcos = require('../models/BarcosModel.js');
 const Mapas = require('../models/MapaModel.js');
 const Territorios = require('../models/TerritorioModel.js');
 const Rodadas = require('../models/RodadaModel.js');
-const adj = require('./funcoes.js');
 const Sequelize = require('sequelize');
 const config = require('../database');
 const sequelize = new Sequelize(config);
@@ -14,23 +13,22 @@ module.exports = {
     name: 'atacar',
     description: 'Para atacar corretamente digite:\n!atacar origem destino. Todas as tropas do território de origem irão atacar',
     async execute(message, args) {
+        //!atacar d5 barco mar reino
+        var adjacentes = {
+            'norte': ['leste', 'oeste'],
+            'sul': ['leste', 'oeste'],
+            'leste': ['norte', 'sul'],
+            'oeste': ['norte', 'sul'],
+        }
         const { commands } = message.client;
-        if (!args.length) {
+        if (args.length == 1 || args.length == 3 || !args.length) {
             return message.channel.send(`Você utilizou esse comando de forma incorreta, ${message.author}!\nDigite:\n!atacar origem destino`);
         } else if (args[1] == 'barco') {
-            //!atacar d5 barco mar reino
-            var adjacentes = {
-                'norte': ['leste', 'oeste'],
-                'sul': ['leste', 'oeste'],
-                'leste': ['norte', 'sul'],
-                'oeste': ['norte', 'sul'],
-            }
             //Lembrar que o nome do reino tem que estar idêntico(letras Maiusculas e minusculas)
             const origem = args[0].toLowerCase();
-            const destino = args[1].toLowerCase();
             const mar = args[2].toLowerCase();
             //const reino_atacado = args[3].toLowerCase();
-            args.splice(0,3)
+            args.splice(0, 3)
             const reino_atacado = args.join(" ")
 
             const Mapa = Mapas(sequelize, Sequelize);
@@ -41,12 +39,12 @@ module.exports = {
             const Rodada = Rodadas(sequelize, Sequelize);
             const Reino = Reinos(sequelize, Sequelize);
 
-            let todos_reinos = await Reino.findAll({ limit: 5, order: [['rei', 'DESC']], attributes: ['rei', 'nome_reino'], raw: true });
             let rodadaatual = await Rodada.findAll({ limit: 1, order: [['createdAt', 'DESC']], attributes: ['id_rodada', 'rodada_atual'], raw: true });
+            let todos_reinos = await Reino.findAll({ limit: 5, order: [['rei', 'DESC']], attributes: ['rei', 'nome_reino'], raw: true });
             let reino = await Reino.findOne({ where: { rei: `${message.author.username}` } });
             let dono = await Territorio.findOne({ where: { rei: `${message.author.username}`, localizacao: `${origem}` } });
             let ataque = await Acao.findOne({ where: { rei: `${message.author.username}`, origem: `${origem}`, rodada: `${rodadaatual[0].rodada_atual}` } });
-            let ataque_barco = await AcaoBarco.findOne({ where: { rei: `${message.author.username}`, origem: `${origem}`, rodada: `${rodadaatual[0].rodada_atual}` } });
+            let acao_barco = await AcaoBarco.findOne({ where: { rei: `${message.author.username}`, origem: `${origem}`, rodada: `${rodadaatual[0].rodada_atual}` } });
             let barcos = await Barco.findAll({ where: { nome_rei: `${message.author.username}` }, order: [['nome_rei', 'DESC']], attributes: ['nome_mar', 'nome_reino', 'nome_rei'], raw: true });
             let barco_atacado = await Barco.findOne({ where: { nome_reino: `${reino_atacado}`, nome_mar: `${mar}` }, attributes: ['nome_mar', 'nome_reino', 'nome_rei'], raw: true });
             let orig = await Mapa.findOne({ where: { nome_mapa: `${origem}` } });
@@ -55,7 +53,7 @@ module.exports = {
                 return message.channel.send(`O territorio de origem não é seu`);
             }
 
-            if (ataque || ataque_barco) {
+            if (ataque || acao_barco) {
                 return message.channel.send(`Já existe uma ação registrada para esse territorio, espere a rodada acabar`);
             }
 
@@ -105,7 +103,7 @@ module.exports = {
             } else {
                 return message.channel.send(`Você não tem acesso ao mar selecionado`);
             }
-        } else {
+        } else if (args.length == 2) {
 
             const origem = args[0].toLowerCase();
             const destino = args[1].toLowerCase();
@@ -118,12 +116,12 @@ module.exports = {
             const Rodada = Rodadas(sequelize, Sequelize);
             const Reino = Reinos(sequelize, Sequelize);
 
-            let reino = await Reino.findOne({ where: { rei: `${message.author.username}` } });
-            let dono = await Territorio.findOne({ where: { rei: `${message.author.username}`, localizacao: `${origem}` } });
             let rodadaatual = await Rodada.findAll({ limit: 1, order: [['createdAt', 'DESC']], attributes: ['id_rodada', 'rodada_atual'], raw: true });
-            let ataque = await Acao.findOne({ where: { rei: `${message.author.username}`, origem: `${origem}`, rodada: `${rodadaatual[0].rodada_atual}` } });
-            let ataque_barco = await AcaoBarco.findOne({ where: { rei: `${message.author.username}`, origem: `${origem}`, rodada: `${rodadaatual[0].rodada_atual}` } });
+            let reino = await Reino.findOne({ where: { rei: `${message.author.username}` } });
+            let acao_barco = await AcaoBarco.findOne({ where: { rei: `${message.author.username}`, origem: `${origem}`, rodada: `${rodadaatual[0].rodada_atual}` } });
             let barcos = await Barco.findAll({ where: { nome_rei: `${message.author.username}` }, order: [['nome_rei', 'DESC']], attributes: ['nome_mar', 'nome_reino', 'nome_rei'], raw: true });
+            let dono = await Territorio.findOne({ where: { rei: `${message.author.username}`, localizacao: `${origem}` } });
+            let ataque = await Acao.findOne({ where: { rei: `${message.author.username}`, origem: `${origem}`, rodada: `${rodadaatual[0].rodada_atual}` } });
             let orig = await Mapa.findOne({ where: { nome_mapa: `${origem}` } });
             let dest = await Mapa.findOne({ where: { nome_mapa: `${destino}` } });
 
@@ -131,7 +129,7 @@ module.exports = {
                 return message.channel.send(`O territorio de origem não é seu`);
             }
 
-            if (adj.adjacente(orig.x, orig.y, dest.x, dest.y)) {
+            if (func.adjacente(orig.x, orig.y, dest.x, dest.y)) {
 
                 if (ataque) {
                     return message.channel.send(`Já existe uma ação registrada para esse territorio, espere a rodada acabar`);
@@ -153,12 +151,17 @@ module.exports = {
                 return message.channel.send(`Ação de ataque registrada. Para ver suas ações nesta rodada, digite !acao ver`);
             }
 
-            if (ataque_barco) {
+            if (acao_barco) {
                 return message.channel.send(`Já existe uma ação registrada para esse territorio, espere a rodada acabar`);
             }
             //O(s) Território(s) envolvidos não possuem adjacencia com um mar
             if (orig.nome_mar == null || dest.nome_mar == null) {
                 return message.channel.send(`Os territórios não estão adjacentes.`);
+            }
+
+            //Teste para saber se existem barcos desocupados
+            if (barcos.length <= reino.barcos_ocupados) {
+                return message.channel.send(`Os territórios não estão adjacentes e você não possui barcos para auxiliar.`);
             }
 
             var mares_controle = []
@@ -167,13 +170,6 @@ module.exports = {
             barcos.forEach(element => {
                 mares_controle.push(element.nome_mar)
             });
-
-            var adjacentes = {
-                'norte': ['leste', 'oeste'],
-                'sul': ['leste', 'oeste'],
-                'leste': ['norte', 'sul'],
-                'oeste': ['norte', 'sul'],
-            }
 
             var retorno = false
             for (let a = 0; a < mares_orig.length; a++) {
@@ -185,13 +181,10 @@ module.exports = {
                 }
             }
 
-            if (barcos.length <= reino.barcos_ocupados) {
-                return message.channel.send(`Os territórios não estão adjacentes e você não possui barcos para auxiliar.`);
-            }
             if (retorno) {
                 reino.increment('barcos_ocupados')
                 AcaoBarco.create({
-                    nome_acao: "usar_barco",
+                    nome_acao: "usar_barco_ataque",
                     tropas: `${dono.dataValues.tropas}`,
                     arqueiros: `${dono.dataValues.arqueiros}`,
                     origem: `${origem}`,
@@ -203,6 +196,8 @@ module.exports = {
             } else {
                 return message.channel.send(`Os territórios não estão adjacentes e você não possui barcos para auxiliar.`);
             }
+        } else {
+            return message.channel.send(`Comando utilizado de forma errada`);
         }
     },
 };
