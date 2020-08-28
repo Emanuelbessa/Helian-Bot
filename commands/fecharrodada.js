@@ -1,12 +1,16 @@
+const func = require('./funcoes.js');
 const Acoes = require('../models/AcoesModel.js');
-const Reinos = require('../models/ReinoModel.js');
+const AcoesBarco = require('../models/AcoesBarcoModel.js');
+const Barcos = require('../models/BarcosModel.js');
 const Territorios = require('../models/TerritorioModel.js');
+const Mapas = require('../models/MapaModel.js');
+const Reinos = require('../models/ReinoModel.js');
 const Relatorios = require('../models/RelatorioModel.js');
 const Rodadas = require('../models/RodadaModel.js');
-const coletadeouro = require('./funcoes.js');
 const Sequelize = require('sequelize');
 const config = require('../database');
 const sequelize = new Sequelize(config);
+const { Op } = require("sequelize")
 module.exports = {
     name: 'fecharrodada',
     description: 'Digite:\n!fecharrodada  para fechar a rodada',
@@ -21,11 +25,18 @@ module.exports = {
             const Territorio = Territorios(sequelize, Sequelize);
             const Relatorio = Relatorios(sequelize, Sequelize);
             const Rodada = Rodadas(sequelize, Sequelize);
+            const AcaoBarco = AcoesBarco(sequelize, Sequelize);
+            const Barco = Barcos(sequelize, Sequelize);
+            const Mapa = Mapas(sequelize, Sequelize);
 
+            let todos_reinos = await Reino.findAll({ order: [['rei', 'DESC']], attributes: ['rei', 'nome_reino'], raw: true });
             let rodadaatual = await Rodada.findAll({ limit: 1, order: [['createdAt', 'DESC']], attributes: ['id_rodada', 'rodada_atual'], raw: true });
             var acoes = await Acao.findAll({ where: { nome_acao: ['atacar', 'apoiar'], rodada: `${rodadaatual[0].rodada_atual}` }, attributes: ['id_acao', 'nome_acao', 'apoio', 'tropas', 'arqueiros', 'rei', 'origem', 'destino'], raw: true });
             var coletas = await Acao.findAll({ where: { nome_acao: ['coletar'], rodada: `${rodadaatual[0].rodada_atual}` }, attributes: ['id_acao', 'nome_acao', 'rei', 'origem'], raw: true });
-
+            var construcao = await Acao.findAll({ where: { nome_acao: ['construir'], rodada: `${rodadaatual[0].rodada_atual}` }, attributes: ['id_acao', 'nome_acao', 'rei', 'origem', 'destino'], raw: true });
+            var atacar_barco = await AcaoBarco.findAll({ where: { nome_acao: ['atacar_barco'], rodada: `${rodadaatual[0].rodada_atual}` }, attributes: ['id_acao', 'nome_acao', 'apoio', 'tropas', 'arqueiros', 'rei', 'origem', 'destino'], raw: true });
+            var usar_barco_ataque = await AcaoBarco.findAll({ where: { nome_acao: ['usar_barco_ataque'], rodada: `${rodadaatual[0].rodada_atual}` }, attributes: ['id_acao', 'nome_acao', 'apoio', 'tropas', 'arqueiros', 'rei', 'origem', 'destino'], raw: true });
+            var usar_barco_apoio = await AcaoBarco.findAll({ where: { nome_acao: ['usar_barco_apoio'], rodada: `${rodadaatual[0].rodada_atual}` }, attributes: ['id_acao', 'nome_acao', 'apoio', 'tropas', 'arqueiros', 'rei', 'origem', 'destino'], raw: true });
 
             var ATACANTES = [];
             var DEFENSORES = [];
@@ -50,6 +61,36 @@ module.exports = {
             12. Apoios Mal sucedidos
             13. Apoiado
             */
+
+            //- Conclusão de ações que não são canceladas
+            for (let i = 0; i < construcao.length; i++) {
+                let reino = await Reino.findOne({ where: { rei: `${construcao.rei}` }, attributes: ['nome_reino', 'rei', 'custo_barco'], raw: true });
+
+                reino.decrement('ouro', { by: reino.custo_barco })
+                reino.increment('custo_barco', { by: 2 })
+                Barco.create({
+                    nome_rei: `${construcao.rei}`,
+                    nome_reino: `${reino.nome_reino}`,
+                    nome_mar: `${construcao.destino}`,
+                });
+            }
+
+            //- Realizar ataques contra barcos
+            /*
+            for (let i = 0; i < atacar_barco.length; i++) {
+                for (let k = 0; k < array.length; k++) {
+                }
+            }
+            */
+            usar_barco_ataque.forEach(function (el, i) {
+                el[i].nome_acao = 'atacar'
+                acoes.push(el[i])
+            })
+
+            usar_barco_apoio.forEach(function (el, i) {
+                el[i].nome_acao = 'apoiar'
+                acoes.push(el[i])
+            })
 
             for (var i = 0; i < acoes.length; i++) {
 
@@ -105,13 +146,11 @@ module.exports = {
             var APOIADO = [];
 
             for (var i = 0; i < acoes.length; i++) {
-
                 if (acoes[i].nome_acao == 'atacar') {
                     ATACANTES.push(acoes[i].origem);
                     DEFENSORES.push(acoes[i].destino);
                 }
                 if (acoes[i].nome_acao == 'apoiar') {
-
                     APOIADOR.push(acoes[i].origem);
                     APOIADO.push(acoes[i].destino);
                 }
@@ -620,11 +659,17 @@ module.exports = {
                 let todosterritorios = await Territorio.findAll({ order: [['rei', 'DESC']], attributes: ['localizacao', 'rei', 'nome_territorio'], where: { rei: `${coletas[i].rei}` }, raw: true });
                 let territorio = await Territorio.findOne({ where: { localizacao: `${coletas[i].origem}` }, attributes: ['localizacao', 'tropas', 'rei'], raw: true });
 
-                var ouroganho = coletadeouro.ourocoletado(reinos.length, todosterritorios.length)
+                var ouroganho = func.ourocoletado(reinos.length, todosterritorios.length)
 
                 Reino.increment('ouro', { by: ouroganho, where: { rei: `${territorio.rei}` } });
 
             }
+            Reino.update({
+                barcos_ocupados: 0,
+            }, {
+                where: { nome_reino: {[Op.not]: null}}
+            });
+
             var novarodada = parseInt(rodadaatual[0].rodada_atual) + 1;
             Rodada.update({
                 rodada_atual: novarodada,

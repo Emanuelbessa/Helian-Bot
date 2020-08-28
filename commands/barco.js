@@ -72,9 +72,6 @@ module.exports = {
 
             if (dono) {
                 if (terr.nome_mar.split(',').includes(mar)) {
-                    // Gasto de ouro e aumento do custo não é feito nesse momento pois existe a possibilidade de cancelar a ação
-                    //reino.decrement('ouro', { by: reino.custo_barco })
-                    //reino.increment('custo_barco', { by: 2 })
                     Acao.create({
                         nome_acao: "construir",
                         origem: `${lugar}`,

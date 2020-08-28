@@ -40,7 +40,7 @@ module.exports = {
             const Reino = Reinos(sequelize, Sequelize);
 
             let rodadaatual = await Rodada.findAll({ limit: 1, order: [['createdAt', 'DESC']], attributes: ['id_rodada', 'rodada_atual'], raw: true });
-            let todos_reinos = await Reino.findAll({ limit: 5, order: [['rei', 'DESC']], attributes: ['rei', 'nome_reino'], raw: true });
+            let todos_reinos = await Reino.findAll({order: [['rei', 'DESC']], attributes: ['rei', 'nome_reino'], raw: true });
             let reino = await Reino.findOne({ where: { rei: `${message.author.username}` } });
             let dono = await Territorio.findOne({ where: { rei: `${message.author.username}`, localizacao: `${origem}` } });
             let ataque = await Acao.findOne({ where: { rei: `${message.author.username}`, origem: `${origem}`, rodada: `${rodadaatual[0].rodada_atual}` } });
