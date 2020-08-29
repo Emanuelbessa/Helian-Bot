@@ -37,6 +37,7 @@ module.exports = {
             var atacar_barco = await AcaoBarco.findAll({ where: { nome_acao: ['atacar_barco'], rodada: `${rodadaatual[0].rodada_atual}` }, attributes: ['id_acao', 'nome_acao', 'apoio', 'tropas', 'arqueiros', 'rei', 'origem', 'destino'], raw: true });
             var usar_barco_ataque = await AcaoBarco.findAll({ where: { nome_acao: ['usar_barco_ataque'], rodada: `${rodadaatual[0].rodada_atual}` }, attributes: ['id_acao', 'nome_acao', 'apoio', 'tropas', 'arqueiros', 'rei', 'origem', 'destino'], raw: true });
             var usar_barco_apoio = await AcaoBarco.findAll({ where: { nome_acao: ['usar_barco_apoio'], rodada: `${rodadaatual[0].rodada_atual}` }, attributes: ['id_acao', 'nome_acao', 'apoio', 'tropas', 'arqueiros', 'rei', 'origem', 'destino'], raw: true });
+            var transferencia = await Acao.findAll({ where: { nome_acao: ['transferir'], rodada: `${rodadaatual[0].rodada_atual}` }, attributes: ['id_acao', 'nome_acao', 'apoio', 'tropas', 'arqueiros', 'rei', 'origem', 'destino', 'ouro'], raw: true });
 
             var ATACANTES = [];
             var DEFENSORES = [];
@@ -64,17 +65,26 @@ module.exports = {
 
             //- Conclusão de ações que não são canceladas
             for (let i = 0; i < construcao.length; i++) {
-                let reino = await Reino.findOne({ where: { rei: `${construcao.rei}` }, attributes: ['nome_reino', 'rei', 'custo_barco'], raw: true });
+                let reino = await Reino.findOne({ where: { rei: `${construcao[i].rei}` }, attributes: ['nome_reino', 'rei', 'custo_barco'], raw: true });
+                if(reino.ouro < reino.custo_barco){
+                    continue
+                }
+                Reino.decrement('ouro', { by: reino.custo_barco, where: { nome_reino: reino.nome_reino } });
+                Reino.increment('custo_barco', { by: 1, where: { nome_reino: reino.nome_reino } });
 
-                reino.decrement('ouro', { by: reino.custo_barco })
-                reino.increment('custo_barco', { by: 2 })
                 Barco.create({
-                    nome_rei: `${construcao.rei}`,
+                    nome_rei: `${construcao[i].rei}`,
                     nome_reino: `${reino.nome_reino}`,
-                    nome_mar: `${construcao.destino}`,
+                    nome_mar: `${construcao[i].destino}`,
                 });
             }
 
+            for (let i = 0; i < transferencia.length; i++) {
+                let reino = await Reino.findOne({ where: { nome_reino: `${transferencia[i].destino}` }, attributes: ['nome_reino', 'rei', 'custo_barco', 'ouro'], raw: true });
+                console.log(reino);
+                Reino.decrement('ouro', { by: transferencia[i].ouro, where: { rei: transferencia[i].rei } });
+                Reino.increment('ouro', { by: transferencia[i].ouro, where: { nome_reino: reino.nome_reino } });
+            }
             //- Realizar ataques contra barcos
             /*
             for (let i = 0; i < atacar_barco.length; i++) {
@@ -83,13 +93,13 @@ module.exports = {
             }
             */
             usar_barco_ataque.forEach(function (el, i) {
-                el[i].nome_acao = 'atacar'
-                acoes.push(el[i])
+                el.nome_acao = 'atacar'
+                acoes.push(el)
             })
 
             usar_barco_apoio.forEach(function (el, i) {
-                el[i].nome_acao = 'apoiar'
-                acoes.push(el[i])
+                el.nome_acao = 'apoiar'
+                acoes.push(el)
             })
 
             for (var i = 0; i < acoes.length; i++) {
@@ -307,11 +317,11 @@ module.exports = {
                         var auxatq = apoiadores.filter(function (a) {
                             return a.apoio === "ataque" && a.destino == acoes[i].destino
                         });
-
+                        console.log(auxatq);
                         var auxdef = apoiadores.filter(function (a) {
                             return a.apoio === "defesa" && a.destino == acoes[i].destino
                         });
-
+                        console.log(auxdef);
                         if (auxatq.length >= 1) {
                             var a = 0
                             auxatq.forEach(function (t, indice) {
@@ -333,7 +343,7 @@ module.exports = {
                             })
 
                             auxdef.forEach(function (t, indice) {
-                                d = d + (t.tropas * 3)
+                                d = d + (t.arqueiros * 3)
                             })
 
                             defesa = defesa + d
@@ -342,7 +352,7 @@ module.exports = {
                     }
 
                     if (ataque > defesa) {
-                        if (!terr) {
+                        if (terr.rei == 'Natureza') {
                             // Primeiro Caso de ataque Bem sucedido, PVE
                             Relatorio.create({
                                 rei: `${acoes[i].rei}`,
@@ -352,13 +362,23 @@ module.exports = {
                                 rodada: `${rodadaatual[0].rodada_atual}`
                             });
                             let terr2 = await Territorio.findOne({ where: { localizacao: `${acoes[i].origem}` }, attributes: ['localizacao', 'tropas', 'rei', 'nome_territorio'], raw: true });
-                            Territorio.create({
-                                localizacao: `${acoes[i].destino}`,
+                            Territorio.update({
                                 rei: `${acoes[i].rei}`,
                                 nome_territorio: `${terr2.nome_territorio}`,
-                                tropas: `0`
+                                tropas: `0`,
+                                arqueiros: `0`
+                            }, {
+                                where: { localizacao: `${acoes[i].destino}` }
+                            });
+                            //Diminuir Tropas de acordo com o ataque à natureza
+                            Territorio.update({
+                                tropas: acoes[i].tropas - terr.tropas,
+                                arqueiros: `0`
+                            }, {
+                                where: { localizacao: `${acoes[i].origem}` }
                             });
                             Reino.increment('ouro', { by: 6, where: { nome_reino: `${terr2.nome_territorio}` } });
+
                         } else {
                             Relatorio.create({
                                 rei: `${acoes[i].rei}`,
@@ -537,7 +557,7 @@ module.exports = {
                             })
 
                             var prejuizo = ataque
-                            //
+                            //erro do natureza
                             if (!terr) {
                                 while (prejuizo >= 1) {
                                     for (let q = 0; q < auxdef.length; q++) {
@@ -614,7 +634,7 @@ module.exports = {
                                 tropas: `${terr.tropas}`,
                                 arqueiros: `${terr.arqueiros}`
                             }, {
-                                where: { localizacao: `${terr.destino}` }
+                                where: { localizacao: `${acoes[i].destino}` }
                             });
                         }
 
@@ -662,12 +682,11 @@ module.exports = {
                 var ouroganho = func.ourocoletado(reinos.length, todosterritorios.length)
 
                 Reino.increment('ouro', { by: ouroganho, where: { rei: `${territorio.rei}` } });
-
             }
             Reino.update({
                 barcos_ocupados: 0,
             }, {
-                where: { nome_reino: {[Op.not]: null}}
+                where: { nome_reino: { [Op.not]: null } }
             });
 
             var novarodada = parseInt(rodadaatual[0].rodada_atual) + 1;

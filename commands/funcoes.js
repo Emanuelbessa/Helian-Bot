@@ -138,7 +138,7 @@ function randomMinMax(min, max) {
 }
 
 function mar_encontra_caminho(mar_origem, mar_destino, mares_controlados, relacao_adjacencia_mares) {
-    var caminhos = []
+    var caminhos = [[mar_origem]]
     cont = 0
 
     for (mar of relacao_adjacencia_mares[mar_origem]) {

@@ -86,11 +86,18 @@ module.exports = {
             barcos.forEach(element => {
                 mares_controle.push(element.nome_mar)
             });
-
+            var adjacentes = {
+                'norte': ['leste', 'oeste'],
+                'sul': ['leste', 'oeste'],
+                'leste': ['norte', 'sul'],
+                'oeste': ['norte', 'sul'],
+            }
             var retorno = false
             for (let a = 0; a < mares_orig.length; a++) {
                 for (let b = 0; b < mares_dest.length; b++) {
-                    retorno = func.mar_encontra_caminho(mares_orig[b], mares_dest[b], mares_controle, adjacentes)
+                    var M_orig = mares_orig[a]
+                    var M_dest = mares_dest[b]
+                    retorno = func.mar_encontra_caminho(M_orig, M_dest, mares_controle, adjacentes)
                     if (retorno) {
                         break
                     }

@@ -26,7 +26,7 @@ module.exports = {
             //Quantidade de Tropas de barbaros possiveis dentro do territórios vazio
             var tropas = [0, 1, 0, 2, 0, 3]
             //N de jogadores iniciais
-            var nJogadores = 5
+            var nJogadores = 4
 
             var Terr_Inicio = func.territoriosIniciais(Todos_Iniciais, nJogadores)
 

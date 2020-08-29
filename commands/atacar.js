@@ -135,6 +135,10 @@ module.exports = {
                     return message.channel.send(`Já existe uma ação registrada para esse territorio, espere a rodada acabar`);
                 }
 
+                if (acao_barco) {
+                    return message.channel.send(`Já existe uma ação registrada para esse territorio, espere a rodada acabar`);
+                }
+
                 if (dono.tropas == 0 && dono.arqueiros == 0) {
                     return message.channel.send(`Você não possui tropas suficientes para realizar um ataque`);
                 }
@@ -152,6 +156,9 @@ module.exports = {
             }
 
             if (acao_barco) {
+                return message.channel.send(`Já existe uma ação registrada para esse territorio, espere a rodada acabar`);
+            }
+            if (ataque) {
                 return message.channel.send(`Já existe uma ação registrada para esse territorio, espere a rodada acabar`);
             }
             //O(s) Território(s) envolvidos não possuem adjacencia com um mar
@@ -174,7 +181,9 @@ module.exports = {
             var retorno = false
             for (let a = 0; a < mares_orig.length; a++) {
                 for (let b = 0; b < mares_dest.length; b++) {
-                    retorno = func.mar_encontra_caminho(mares_orig[b], mares_dest[b], mares_controle, adjacentes)
+                    var M_orig = mares_orig[a]
+                    var M_dest = mares_dest[b]
+                    retorno = func.mar_encontra_caminho(M_orig, M_dest, mares_controle, adjacentes)
                     if (retorno) {
                         break
                     }
