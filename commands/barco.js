@@ -9,7 +9,7 @@ const config = require('../database');
 const sequelize = new Sequelize(config);
 module.exports = {
     name: 'barco',
-    description: '--',
+    description: 'Comando para construir barco, para usar digite !construir barco territorio mar. ',
     async execute(message, args) {
         const { commands } = message.client;
         if (args.length > 3) {

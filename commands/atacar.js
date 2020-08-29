@@ -11,7 +11,7 @@ const config = require('../database');
 const sequelize = new Sequelize(config);
 module.exports = {
     name: 'atacar',
-    description: 'Para atacar corretamente digite:\n!atacar origem destino. Todas as tropas do território de origem irão atacar',
+    description: 'Para atacar corretamente digite: !atacar origem destino. Todas as tropas do território de origem irão atacar',
     async execute(message, args) {
         //!atacar d5 barco mar reino
         var adjacentes = {

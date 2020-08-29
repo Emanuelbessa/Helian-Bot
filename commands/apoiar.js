@@ -11,7 +11,7 @@ const config = require('../database');
 const sequelize = new Sequelize(config);
 module.exports = {
     name: 'apoiar',
-    description: 'Para apoiar corretamente digite:!apoiar origem ataque/defesa destino. Não há limite para quantidade de apoios em um território',
+    description: 'Para apoiar corretamente digite: !apoiar origem ataque/defesa destino. Não há limite para quantidade de apoios em um território',
     async execute(message, args) {
         const { commands } = message.client;
         if (args.length != 3) {

@@ -8,11 +8,11 @@ const config = require('../database');
 const sequelize = new Sequelize(config);
 module.exports = {
     name: 'treinar',
-    description: 'Para treinar as tropas corretamente digite:\n!treinar quantidade_de_tropas localização',
+    description: 'Treina soldados (Força 1 para ataque / defesa, custo 1) ou arqueiros(Força 1 para ataque / 3 para defesa, custo 3). Para treinar digite: !treinar tipodatropa quantidade_de_tropas localização',
     async execute(message, args) {
         const { commands } = message.client;
         if (args.length != 3) {
-            return message.channel.send(`Você utilizou esse comando de forma incorreta, ${message.author}!\nPara treinar corretamente digite:\n!treinar tipodatropa quantidadedetropas localização`);
+            return message.channel.send(`Você utilizou esse comando de forma incorreta, ${message.author}! Para treinar corretamente digite: !treinar tipodatropa quantidadedetropas localização`);
         } else {
 
             var Tipos = ["sol", "arq", "a", "arqueiro", "s", "soldado"]

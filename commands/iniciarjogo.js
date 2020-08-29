@@ -7,7 +7,7 @@ const sequelize = new Sequelize(config);
 
 module.exports = {
     name: 'iniciar',
-    description: '',
+    description: 'Comando para iniciar o jogo, registra configurações do mapa e de entrada dos jogadores.',
     async execute(message, args) {
         const { commands } = message.client;
         if (message.author.username != "Emanuel") {
