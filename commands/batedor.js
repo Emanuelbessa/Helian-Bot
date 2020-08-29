@@ -7,7 +7,7 @@ const config = require('../database');
 const sequelize = new Sequelize(config);
 module.exports = {
     name: 'batedor',
-    description: 'Para atacar corretamente digite:\n!atacar origem destino. Todas as tropas do território de origem irão atacar',
+    description: 'Envia um batedor rápido que verifica se existem bárbaros em dois territórios vizinhos. Para usar digite: !batedor origem destino1 destino2',
     async execute(message, args) {
         const { commands } = message.client;
         if (args.length != 3) {

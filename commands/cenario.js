@@ -8,7 +8,7 @@ const sequelize = new Sequelize(config);
 
 module.exports = {
     name: 'cenario',
-    description: 'Comando que lhe informa tudo que é conhecido sobre os outros reinos',
+    description: 'Comando que lhe informa tudo que é conhecido sobre os outros reinos. Barcos só ficam visíveis por quem possui território no litoral daquele mar.',
     cooldown: 10,
     async execute(message, args) {
 

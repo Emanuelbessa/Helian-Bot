@@ -13,7 +13,7 @@ const sequelize = new Sequelize(config);
 const { Op } = require("sequelize")
 module.exports = {
     name: 'fecharrodada',
-    description: 'Digite:\n!fecharrodada  para fechar a rodada',
+    description: 'Digite: !fecharrodada  para fechar a rodada. Atenção! Você provavelmente não tem autorização para isso.',
     async execute(message, args) {
         const { commands } = message.client;
         if (message.author.username != "Emanuel") {

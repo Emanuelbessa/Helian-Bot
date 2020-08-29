@@ -67,7 +67,7 @@ module.exports = {
                 })
                 if (tipo2.length >= 1) {
                     var msg1a = "Os ataque que fizemos em: "
-                    var msg1b = " saíram vencedores\n"
+                    var msg1b = " saíram vencedores no combate\n"
                     var locs1 = ""
                     tipo2.forEach(function (p, i) {
                         locs1 = locs1 + " " + p.destino
@@ -80,7 +80,7 @@ module.exports = {
                 })
                 if (tipo3.length >= 1) {
                     var msg1a = "Os ataque que fizemos em: "
-                    var msg1b = " falharam\n"
+                    var msg1b = " falharam em combate, mal sobrevivemos.\n"
                     var locs1 = ""
                     tipo3.forEach(function (p, i) {
                         locs1 = locs1 + " " + p.destino
@@ -171,7 +171,7 @@ module.exports = {
                 })
                 if (tipo10.length >= 1) {
                     var msg1a = "Nossas tentativas de apoio em: "
-                    var msg1b = " não aconteceram, pois nossas tropas tiveram que ficar para lutar\n"
+                    var msg1b = " não aconteceram pois nossas tropas tiveram que ficar para lutar\n"
                     var locs1 = ""
                     tipo10.forEach(function (p, i) {
                         locs1 = locs1 + " " + p.destino
@@ -197,7 +197,7 @@ module.exports = {
                 })
                 if (tipo12.length >= 1) {
                     var msg1a = "Nossos apoios em: "
-                    var msg1b = " foram mal sucedidos\n"
+                    var msg1b = " foram mal sucedidos em combate\n"
                     var locs1 = ""
                     tipo12.forEach(function (p, i) {
                         locs1 = locs1 + " " + p.destino
