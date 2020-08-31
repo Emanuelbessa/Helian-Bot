@@ -6,13 +6,16 @@ const Sequelize = require('sequelize');
       autoIncrement: true,
       primaryKey: true
     },
+    rei: Sequelize.STRING,
+    reino: Sequelize.STRING,
     nome_acao: Sequelize.STRING,
     apoio: Sequelize.STRING,
     tropas: Sequelize.INTEGER,
     arqueiros: Sequelize.INTEGER,
-    rei: Sequelize.STRING,
     origem: Sequelize.STRING,
     destino: Sequelize.STRING,
+    reino_alvo: Sequelize.STRING,
+    ouro: Sequelize.INTEGER,
     rodada: Sequelize.STRING,
     });
   }
