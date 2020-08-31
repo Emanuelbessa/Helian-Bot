@@ -169,6 +169,40 @@ function mar_encontra_caminho(mar_origem, mar_destino, mares_controlados, relaca
     return encontrou_caminho
 }
 
+function mar_encontra_adjacente(mar_origem, mar_destino, mares_controlados, relacao_adjacencia_mares) {
+    var caminhos = [[mar_origem]]
+    cont = 0
+
+    for (mar of relacao_adjacencia_mares[mar_origem]) {
+        if (mares_controlados.includes(mar)) {
+            var lista_vazia = []
+            caminhos.push(lista_vazia)
+            caminhos[cont].push(mar)
+            cont++
+        }
+    }
+    var mares_possiveis = []
+    for (let i = 0; i < caminhos.length; i++) {
+        for (const mar_caminho of caminhos[i]) {
+            for (const mar_adjacente of relacao_adjacencia_mares[mar_caminho]) {
+                console.log('mar adjacente :', mar_adjacente);
+                if (!mares_possiveis.includes(mar_adjacente)) {
+                    mares_possiveis.push(mar_adjacente)
+                }
+            }
+        }
+    }
+
+    encontrou_caminho = false
+    if (mares_possiveis.includes(mar_destino)) {
+        encontrou_caminho = true
+    }
+    return encontrou_caminho
+}
+
+function isValid(str) {
+    return !/[~`!#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/g.test(str);
+}
 module.exports.ourocoletado = ourocoletado;
 module.exports.adjacente = adjacente;
 module.exports.adjacente = adjacente2dist;
@@ -176,3 +210,5 @@ module.exports.territoriosIniciais = territoriosIniciais;
 module.exports.numerosParaLetras = numerosParaLetras;
 module.exports.randomMinMax = randomMinMax;
 module.exports.mar_encontra_caminho = mar_encontra_caminho;
+module.exports.mar_encontra_adjacente = mar_encontra_adjacente;
+module.exports.isValid = isValid;

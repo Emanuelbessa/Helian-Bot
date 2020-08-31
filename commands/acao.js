@@ -9,7 +9,9 @@ module.exports = {
     description: 'Comando para gerenciar suas ações na rodada, digite !acao ver para verificar suas ações feitas até o momento e !acao apagar para apagar todas',
     async execute(message, args) {
         const { commands } = message.client;
-        if (args[0] == 'apagar') {
+        if (args.length > 1) {
+            return message.channel.send(`Comando de ação usado de forma incorreta`);
+        } else if (args[0] == 'apagar') {
 
             const Territorio = Territorios(sequelize, Sequelize);
             const Acao = Acoes(sequelize, Sequelize);
@@ -34,7 +36,7 @@ module.exports = {
 
             if (ver) {
                 message.channel.send(`Suas ações da rodada atual são:\n`);
-                
+
                 for (var i = 0; i < ver.length; i++) {
                     message.channel.send(`Ação: **${ver[i].nome_acao}**; Tropas: **${ver[i].tropas}**; Arqueiros: **${ver[i].arqueiros}**; Origem: **${ver[i].origem}**; Destino: **${ver[i].destino}**\n`);
                 }

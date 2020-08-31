@@ -1,3 +1,4 @@
+const func = require('./funcoes.js');
 const Reinos = require('../models/ReinoModel.js');
 const Sequelize = require('sequelize');
 const config = require('../database');
@@ -10,7 +11,7 @@ module.exports = {
 		const { commands } = message.client;
 		if (!args.length) {
 			return message.channel.send(`Você utilizou esse comando de forma incorreta, ${message.author}!\nPara cadastrar corretamente digite:\n!novoreino nomedoreino`);
-		} else {
+		} else if (func.isValid(args.join(" "))){
 
 			const name = args.join(" ");
 			const Reino = Reinos(sequelize, Sequelize);
@@ -20,18 +21,14 @@ module.exports = {
 			if (temreino) {
 				return message.channel.send(`Você já é dono de um Reino`);
 			} else {
-
 				Reino.create({
 					nome_reino: `${name}`,
 					rei: `${message.author.username}`,
 					ouro: 10,
 					inicial_conquistado: 0
 				});
-
 				return message.channel.send(`Reino conquistado com sucesso!\nO nome dele é: **${name}**`);
 			}
-
-
 		}
 	},
 };
