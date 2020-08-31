@@ -5,7 +5,7 @@ const Sequelize = require('sequelize');
 const config = require('../database');
 const sequelize = new Sequelize(config);
 module.exports = {
-    name: 'coleta',
+    name: 'coletar',
     description: 'Foca o território em produzir riquezas. Na próxima rodada irá conceder ouro a quem for o dono deste território. Quanto mais territórios possuir, menos ouro dará. Para usar digite !coleta território',
     async execute(message, args) {
         const { commands } = message.client;
@@ -30,9 +30,9 @@ module.exports = {
             //verificando se é o dono do território
             if (dono) {
                 Acao.create({
+                    rei: `${message.author.username}`,
                     nome_acao: "coletar",
                     origem: `${territorio}`,
-                    rei: `${message.author.username}`,
                     rodada: `${rodadaatual[0].rodada_atual}`
                 });
                 return message.channel.send(`Ação de coletar registrada`);
