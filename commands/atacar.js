@@ -29,6 +29,8 @@ module.exports = {
             const mar = args[2].toLowerCase();
             //const reino_atacado = args[3].toLowerCase();
             args.splice(0, 3)
+            //Bug no ataqaue à barcos que tenhma mais de 2 nome no nome do reino?
+            //Preciso testar
             const reino_atacado = args.join(" ")
 
             const Mapa = Mapas(sequelize, Sequelize);
@@ -40,7 +42,7 @@ module.exports = {
             const Reino = Reinos(sequelize, Sequelize);
 
             let rodadaatual = await Rodada.findAll({ limit: 1, order: [['createdAt', 'DESC']], attributes: ['id_rodada', 'rodada_atual'], raw: true });
-            let todos_reinos = await Reino.findAll({order: [['rei', 'DESC']], attributes: ['rei', 'nome_reino'], raw: true });
+            let todos_reinos = await Reino.findAll({ order: [['rei', 'DESC']], attributes: ['rei', 'nome_reino'], raw: true });
             let reino = await Reino.findOne({ where: { rei: `${message.author.username}` } });
             let dono = await Territorio.findOne({ where: { rei: `${message.author.username}`, localizacao: `${origem}` } });
             let ataque = await Acao.findOne({ where: { rei: `${message.author.username}`, origem: `${origem}`, rodada: `${rodadaatual[0].rodada_atual}` } });
@@ -67,6 +69,7 @@ module.exports = {
                     existe_reino = true
                 }
             }
+
             if (!existe_reino) {
                 return message.channel.send(`Esse reino não existe, certifique-se que ele está digitado corretamente`);
             }
@@ -84,7 +87,8 @@ module.exports = {
 
             var retorno = false
             for (let a = 0; a < mares_orig.length; a++) {
-                retorno = func.mar_encontra_caminho(mares_orig[a], mares_dest, mares_controle, adjacentes)
+                var M_orig = mares_orig[a]
+                retorno = func.mar_encontra_caminho(M_orig, mares_dest, mares_controle, adjacentes)
                 if (retorno) {
                     break
                 }
@@ -93,10 +97,12 @@ module.exports = {
             if (retorno) {
                 reino.increment('barcos_ocupados')
                 AcaoBarco.create({
+                    rei: `${message.author.username}`,
+                    reino: `${reino.nome_reino}`,
                     nome_acao: "atacar_barco",
                     origem: `${origem}`,
-                    destino: `${reino_atacado}`,
-                    rei: `${message.author.username}`,
+                    destino: mar,
+                    reino_alvo: `${reino_atacado}`,
                     rodada: `${rodadaatual[0].rodada_atual}`
                 });
                 return message.channel.send(`Ação de ataque registrada. Para ver suas ações nesta rodada, digite !acao ver`);
@@ -116,6 +122,7 @@ module.exports = {
             const Rodada = Rodadas(sequelize, Sequelize);
             const Reino = Reinos(sequelize, Sequelize);
 
+            let todos_territorios_atacante = await Territorio.findAll({ where: { rei: `${message.author.username}` }, order: [['rei', 'DESC']], attributes: ['rei', 'localizacao', 'nome_territorio'], raw: true });
             let rodadaatual = await Rodada.findAll({ limit: 1, order: [['createdAt', 'DESC']], attributes: ['id_rodada', 'rodada_atual'], raw: true });
             let reino = await Reino.findOne({ where: { rei: `${message.author.username}` } });
             let acao_barco = await AcaoBarco.findOne({ where: { rei: `${message.author.username}`, origem: `${origem}`, rodada: `${rodadaatual[0].rodada_atual}` } });
@@ -129,37 +136,32 @@ module.exports = {
                 return message.channel.send(`O territorio de origem não é seu`);
             }
 
+            for (let i = 0; i < todos_territorios_atacante.length; i++) {
+                if (todos_territorios_atacante[i].localizacao == destino) {
+                    return message.channel.send(`O territorio de destino é seu, Quer matar o seu próprio povo?\nVocê não pode fazer isso.`);
+                }
+            }
+
+            if (ataque || acao_barco) {
+                return message.channel.send(`Já existe uma ação registrada para esse territorio, espere a rodada acabar`);
+            }
+
             if (func.adjacente(orig.x, orig.y, dest.x, dest.y)) {
-
-                if (ataque) {
-                    return message.channel.send(`Já existe uma ação registrada para esse territorio, espere a rodada acabar`);
-                }
-
-                if (acao_barco) {
-                    return message.channel.send(`Já existe uma ação registrada para esse territorio, espere a rodada acabar`);
-                }
-
                 if (dono.tropas == 0 && dono.arqueiros == 0) {
                     return message.channel.send(`Você não possui tropas suficientes para realizar um ataque`);
                 }
 
                 Acao.create({
+                    rei: `${message.author.username}`,
+                    reino: `${reino.nome_reino}`,
                     nome_acao: "atacar",
                     tropas: `${dono.dataValues.tropas}`,
                     arqueiros: `${dono.dataValues.arqueiros}`,
                     origem: `${origem}`,
                     destino: `${destino}`,
-                    rei: `${message.author.username}`,
                     rodada: `${rodadaatual[0].rodada_atual}`
                 });
                 return message.channel.send(`Ação de ataque registrada. Para ver suas ações nesta rodada, digite !acao ver`);
-            }
-
-            if (acao_barco) {
-                return message.channel.send(`Já existe uma ação registrada para esse territorio, espere a rodada acabar`);
-            }
-            if (ataque) {
-                return message.channel.send(`Já existe uma ação registrada para esse territorio, espere a rodada acabar`);
             }
             //O(s) Território(s) envolvidos não possuem adjacencia com um mar
             if (orig.nome_mar == null || dest.nome_mar == null) {
@@ -193,12 +195,13 @@ module.exports = {
             if (retorno) {
                 reino.increment('barcos_ocupados')
                 AcaoBarco.create({
+                    rei: `${message.author.username}`,
+                    reino: `${reino.nome_reino}`,
                     nome_acao: "usar_barco_ataque",
                     tropas: `${dono.dataValues.tropas}`,
                     arqueiros: `${dono.dataValues.arqueiros}`,
                     origem: `${origem}`,
                     destino: `${destino}`,
-                    rei: `${message.author.username}`,
                     rodada: `${rodadaatual[0].rodada_atual}`
                 });
                 return message.channel.send(`Ação de ataque registrada. Para ver suas ações nesta rodada, digite !acao ver`);
