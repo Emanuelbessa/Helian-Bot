@@ -15,7 +15,6 @@ module.exports = {
     async execute(message, args) {
         const { commands } = message.client;
         if (args.length != 3) {
-            console.log(args.length);
             return message.channel.send(`Você utilizou esse comando de forma incorreta, ${message.author}! Digite:!apoiar origem ataque/defesa destino`);
         } else if (args[1] == 'ataque' || args[1] == 'defesa') {
 
@@ -55,13 +54,14 @@ module.exports = {
                 }
 
                 Acao.create({
+                    rei: `${message.author.username}`,
+                    reino: `${reino.nome_reino}`,
                     nome_acao: "apoiar",
                     apoio: `${intencao}`,
                     tropas: `${dono.dataValues.tropas}`,
                     arqueiros: `${dono.dataValues.arqueiros}`,
                     origem: `${origem}`,
                     destino: `${destino}`,
-                    rei: `${message.author.username}`,
                     rodada: `${rodadaatual[0].rodada_atual}`
                 });
                 return message.channel.send(`Ação de apoiar registrada`);
@@ -107,13 +107,14 @@ module.exports = {
             if (retorno) {
                 reino.increment('barcos_ocupados')
                 AcaoBarco.create({
+                    rei: `${message.author.username}`,
+                    reino: `${reino.nome_reino}`,
                     nome_acao: "usar_barco_apoio",
                     apoio: `${intencao}`,
                     tropas: `${dono.dataValues.tropas}`,
                     arqueiros: `${dono.dataValues.arqueiros}`,
                     origem: `${origem}`,
                     destino: `${destino}`,
-                    rei: `${message.author.username}`,
                     rodada: `${rodadaatual[0].rodada_atual}`
                 });
                 return message.channel.send(`Ação de apoiar registrada. Para ver suas ações nesta rodada, digite !acao ver`);

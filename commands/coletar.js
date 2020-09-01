@@ -6,12 +6,11 @@ const config = require('../database');
 const sequelize = new Sequelize(config);
 module.exports = {
     name: 'coletar',
-    description: 'Foca o território em produzir riquezas. Na próxima rodada irá conceder ouro a quem for o dono deste território. Quanto mais territórios possuir, menos ouro dará. Para usar digite !coleta território',
+    description: 'Foca o território em produzir riquezas. Na próxima rodada irá conceder ouro a quem for o dono deste território. Quanto mais territórios possuir, menos ouro dará. Para usar digite !coletar território',
     async execute(message, args) {
         const { commands } = message.client;
         if (args.length != 1) {
-            return message.channel.send('Comando utilizado de forma incorreta, digite !coleta território.');
-
+            return message.channel.send('Comando utilizado de forma incorreta, digite !coletar território.');
         } else {
             const territorio = args[0].toLowerCase();
 

@@ -152,7 +152,7 @@ function mar_encontra_caminho(mar_origem, mar_destino, mares_controlados, relaca
     for (let i = 0; i < caminhos.length; i++) {
         for (const mar_caminho of caminhos[i]) {
             for (const mar_adjacente of relacao_adjacencia_mares[mar_caminho]) {
-                console.log('mar adjacente :', mar_adjacente);
+                // console.log('mar adjacente :', mar_adjacente);
                 if (!caminhos[i].includes(mar_adjacente) && mares_controlados.includes(mar_adjacente) && !caminhos[i].includes(mar_destino)) {
                     caminhos[i].push(mar_adjacente)
                     console.log(caminhos)

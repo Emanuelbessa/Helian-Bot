@@ -25,10 +25,11 @@ module.exports = {
                 return message.channel.send(`Você não tem ouro para transferir`);
             } else {
                 Acao.create({
+                    rei: `${message.author.username}`,
+                    reino: `${reino.nome_reino}`,
                     nome_acao: "transferir",
                     origem: `${reino.nome_reino}`,
                     destino: `${reino_destino}`,
-                    rei: `${message.author.username}`,
                     ouro: dinheiro,
                     rodada: `${rodadaatual[0].rodada_atual}`
                 });
