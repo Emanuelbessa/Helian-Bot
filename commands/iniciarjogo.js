@@ -10,10 +10,9 @@ module.exports = {
     description: 'Comando para iniciar o jogo, registra configurações do mapa e de entrada dos jogadores.',
     async execute(message, args) {
         const { commands } = message.client;
-        if (message.author.username != "Emanuel") {
+        if (message.author.username != "Emanuel" && args.length != 1) {
             return message.channel.send('Você não tem permissão para usar o comando')
         } else {
-
             const Inicio = TerritorioInicial(sequelize, Sequelize);
             const Territorio = Territorios(sequelize, Sequelize);
 
@@ -26,7 +25,7 @@ module.exports = {
             //Quantidade de Tropas de barbaros possiveis dentro do territórios vazio
             var tropas = [0, 1, 0, 2, 0, 3]
             //N de jogadores iniciais
-            var nJogadores = 4
+            var nJogadores = args[0]
 
             var Terr_Inicio = func.territoriosIniciais(Todos_Iniciais, nJogadores)
 
@@ -45,7 +44,6 @@ module.exports = {
             } else {
                 return message.channel.send(`Comando não conseguiu encontrar territórios suficientes para todos os jogadores, tente novamente`)
             }
-
 
             barbaros = Todos_Territorios.filter(function (el) {
                 return Terr_Inicio.indexOf(el) < 0;
