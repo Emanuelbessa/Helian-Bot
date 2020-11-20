@@ -15,7 +15,7 @@ module.exports = {
             return message.channel.send(`Você utilizou esse comando de forma incorreta, ${message.author}! Para treinar corretamente digite: !treinar tipodatropa quantidadedetropas localização`);
         } else {
 
-            var Tipos = ["sol", "arq", "a", "arqueiro", "s", "soldado"]
+            var Tipos = ["soldado", "sol",  "s" , "arqueiro", "arq", "a" ]
 
             const tipotropa = args[0].toLowerCase();
             const ntropas = args[1].toLowerCase();
