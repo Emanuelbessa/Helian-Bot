@@ -1,21 +1,20 @@
 const Sequelize = require('sequelize');
  module.exports = (sequelize, type) => {
-    return sequelize.define('reinos', {
-      id_reino: {
+    return sequelize.define('cotacoes', {
+      id_cotacao: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
       primaryKey: true
     },
-    nome_reino: Sequelize.STRING,
-    inicial_conquistado: Sequelize.INTEGER,
+    reino: Sequelize.STRING,
     rei: Sequelize.STRING,
-    ouro: Sequelize.INTEGER,
     ferro: Sequelize.INTEGER,
     madeira: Sequelize.INTEGER,
     tecido: Sequelize.INTEGER,
     oleo: Sequelize.INTEGER,
     trigo: Sequelize.INTEGER,
-    custo_barco: Sequelize.INTEGER,
-    barcos_ocupados: Sequelize.INTEGER,
+    rodada: Sequelize.INTEGER,
+    }, {
+      freezeTableName: true,
     });
   }
