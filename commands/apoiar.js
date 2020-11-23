@@ -23,26 +23,35 @@ module.exports = {
             const destino = args[2].toLowerCase();
 
             const Mapa = Mapas(sequelize, Sequelize);
-            const Acao = Acoes(sequelize, Sequelize);
             const Barco = Barcos(sequelize, Sequelize);
-            const AcaoBarco = AcoesBarco(sequelize, Sequelize);
             const Territorio = Territorios(sequelize, Sequelize);
             const Rodada = Rodadas(sequelize, Sequelize);
-            const Reino = Reinos(sequelize, Sequelize);
+            const AcaoBarco = AcoesBarco(sequelize, Sequelize);
+            const Acao = Acoes(sequelize, Sequelize);
 
             let rodadaatual = await Rodada.findAll({ limit: 1, order: [['createdAt', 'DESC']], attributes: ['id_rodada', 'rodada_atual'], raw: true });
-            let reino = await Reino.findOne({ where: { rei: `${message.author.username}` } });
-            let acao_barco = await AcaoBarco.findOne({ where: { rei: `${message.author.username}`, origem: `${origem}`, rodada: `${rodadaatual[0].rodada_atual}` } });
-            let barcos = await Barco.findAll({ where: { nome_rei: `${message.author.username}` }, order: [['nome_rei', 'DESC']], attributes: ['nome_mar', 'nome_reino', 'nome_rei'], raw: true });
+            let acoes_barco = await AcaoBarco.findAll({ where: { nome_rei: `${message.author.username}`, rodada: `${rodadaatual[0].rodada_atual}` }, order: [['rei', 'DESC']], attributes: ['rei'], raw: true });           
+            let acoes = await Acao.findAll({ where: { nome_rei: `${message.author.username}`, rodada: `${rodadaatual[0].rodada_atual}` }, order: [['rei', 'DESC']], attributes: ['rei'], raw: true });
+            let todosterritorios = await Territorio.findAll({ order: [['rei', 'DESC']], attributes: ['rei'], where: { rei: `${message.author.username}` }, raw: true });
             let dono = await Territorio.findOne({ where: { rei: `${message.author.username}`, localizacao: `${origem}` } });
-            let acao = await Acao.findOne({ where: { rei: `${message.author.username}`, origem: `${origem}`, rodada: `${rodadaatual[0].rodada_atual}` } });
             let orig = await Mapa.findOne({ where: { nome_mapa: `${origem}` } });
             let dest = await Mapa.findOne({ where: { nome_mapa: `${destino}` } });
+
+            var acoes_totais = (acoes_barco ? acoes_barco.length : 0) + (acoes ? acoes.length : 0)
+
+            if (acoes_totais >= func.quantidadeAcoes(todosterritorios.length)) {
+                return message.channel.send(`Você atingiu o limite de ações nessa rodada`);
+            }
 
             if (!dono) {
                 return message.channel.send(`O territorio de origem não é seu`);
             }
 
+            const Reino = Reinos(sequelize, Sequelize);
+
+            let reino = await Reino.findOne({ where: { rei: `${message.author.username}` } });
+            let acao = await Acao.findOne({ where: { rei: `${message.author.username}`, origem: `${origem}`, rodada: `${rodadaatual[0].rodada_atual}` } });
+            
             if (func.adjacente(orig.x, orig.y, dest.x, dest.y)) {
 
                 if (acao) {
@@ -67,6 +76,9 @@ module.exports = {
                 return message.channel.send(`Ação de apoiar registrada`);
             }
 
+            let acao_barco = await AcaoBarco.findOne({ where: { rei: `${message.author.username}`, origem: `${origem}`, rodada: `${rodadaatual[0].rodada_atual}` } });
+            let barcos = await Barco.findAll({ where: { nome_rei: `${message.author.username}` }, order: [['nome_rei', 'DESC']], attributes: ['nome_mar', 'nome_reino', 'nome_rei'], raw: true });
+    
             if (acao_barco) {
                 return message.channel.send(`Já existe uma ação registrada para esse territorio, espere a rodada acabar`);
             }
