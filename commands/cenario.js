@@ -16,7 +16,7 @@ module.exports = {
         const Reino = Reinos(sequelize, Sequelize);
         const Barco = Barcos(sequelize, Sequelize);
 
-        let todosterritorios = await Territorio.findAll({ order: [['rei', 'DESC']], attributes: ['localizacao', 'rei', 'nome_territorio'], raw: true });
+        let todosterritorios = await Territorio.findAll({ order: [['localizacao', 'ASC']], attributes: ['localizacao', 'rei', 'nome_territorio'], raw: true });
         let reinos = await Reino.findAll({ order: [['rei', 'DESC']], attributes: ['rei', 'nome_reino'], raw: true });
         let barcos = await Barco.findAll({ order: [['nome_rei', 'DESC']], attributes: ['nome_rei', 'nome_reino', 'nome_mar'], raw: true });
 
