@@ -3,6 +3,7 @@ const Acoes = require('../models/AcoesModel.js');
 const AcoesBarco = require('../models/AcoesBarcoModel.js');
 const Reinos = require('../models/ReinoModel.js');
 const Barcos = require('../models/BarcosModel.js');
+const AcoesBarcos = require('../models/AcoesBarcoModel.js');
 const Mapas = require('../models/MapaModel.js');
 const Territorios = require('../models/TerritorioModel.js');
 const Rodadas = require('../models/RodadaModel.js');
@@ -20,8 +21,7 @@ module.exports = {
             'leste': ['norte', 'sul'],
             'oeste': ['norte', 'sul'],
         }
-        const { commands } = message.client;
-        if (args.length == 1 || args.length == 3 || !args.length) {
+        if ([0, 1, 3].includes(args.length)) {
             return message.channel.send(`Você utilizou esse comando de forma incorreta, ${message.author}!\nDigite:\n!atacar origem destino`);
         } else if (args[1] == 'barco') {
             //Lembrar que o nome do reino tem que estar idêntico(letras Maiusculas e minusculas)
@@ -42,6 +42,8 @@ module.exports = {
             const Reino = Reinos(sequelize, Sequelize);
 
             let rodadaatual = await Rodada.findAll({ limit: 1, order: [['createdAt', 'DESC']], attributes: ['id_rodada', 'rodada_atual'], raw: true });
+            let acoes_barco = await AcaoBarco.findAll({ where: { nome_rei: `${message.author.username}`, rodada: `${rodadaatual[0].rodada_atual}` }, order: [['rei', 'DESC']], attributes: ['rei'], raw: true });
+            let acoes = await Acao.findAll({ where: { nome_rei: `${message.author.username}`, rodada: `${rodadaatual[0].rodada_atual}` }, order: [['rei', 'DESC']], attributes: ['rei'], raw: true });
             let todos_reinos = await Reino.findAll({ order: [['rei', 'DESC']], attributes: ['rei', 'nome_reino'], raw: true });
             let reino = await Reino.findOne({ where: { rei: `${message.author.username}` } });
             let dono = await Territorio.findOne({ where: { rei: `${message.author.username}`, localizacao: `${origem}` } });
@@ -51,13 +53,19 @@ module.exports = {
             let barco_atacado = await Barco.findOne({ where: { nome_reino: `${reino_atacado}`, nome_mar: `${mar}` }, attributes: ['nome_mar', 'nome_reino', 'nome_rei'], raw: true });
             let orig = await Mapa.findOne({ where: { nome_mapa: `${origem}` } });
 
+            var acoes_totais = (acoes_barco ? acoes_barco.length : 0) + (acoes ? acoes.length : 0)
+
+            if (acoes_totais >= func.quantidadeAcoes(todosterritorios.length)) {
+                return message.channel.send(`Você atingiu o limite de ações nessa rodada`);
+            }
+
             if (!dono) {
                 return message.channel.send(`O territorio de origem não é seu`);
             }
 
-            if (ataque || acao_barco) {
-                return message.channel.send(`Já existe uma ação registrada para esse territorio, espere a rodada acabar`);
-            }
+            // if (ataque || acao_barco) {
+            //     return message.channel.send(`Já existe uma ação registrada para esse territorio, espere a rodada acabar`);
+            // }
 
             if (barcos.length <= reino.barcos_ocupados) {
                 return message.channel.send(`Você não possui barcos para realizar esse ataque`);
@@ -124,13 +132,21 @@ module.exports = {
 
             let todos_territorios_atacante = await Territorio.findAll({ where: { rei: `${message.author.username}` }, order: [['rei', 'DESC']], attributes: ['rei', 'localizacao', 'nome_territorio'], raw: true });
             let rodadaatual = await Rodada.findAll({ limit: 1, order: [['createdAt', 'DESC']], attributes: ['id_rodada', 'rodada_atual'], raw: true });
+            let acoes_barco = await AcaoBarco.findAll({ where: { rei: `${message.author.username}`, rodada: `${rodadaatual[0].rodada_atual}` }, order: [['rei', 'DESC']], attributes: ['rei'], raw: true });
+            let acoes = await Acao.findAll({ where: { rei: `${message.author.username}`, rodada: `${rodadaatual[0].rodada_atual}` }, order: [['rei', 'DESC']], attributes: ['rei'], raw: true });
             let reino = await Reino.findOne({ where: { rei: `${message.author.username}` } });
-            let acao_barco = await AcaoBarco.findOne({ where: { rei: `${message.author.username}`, origem: `${origem}`, rodada: `${rodadaatual[0].rodada_atual}` } });
+            let acao_barco = await AcaoBarco.findOne({ where: { rei: `${message.author.username}`, nome_acao: 'usar_barco_ataque', origem: `${origem}`, rodada: `${rodadaatual[0].rodada_atual}` } });
             let barcos = await Barco.findAll({ where: { nome_rei: `${message.author.username}` }, order: [['nome_rei', 'DESC']], attributes: ['nome_mar', 'nome_reino', 'nome_rei'], raw: true });
             let dono = await Territorio.findOne({ where: { rei: `${message.author.username}`, localizacao: `${origem}` } });
-            let ataque = await Acao.findOne({ where: { rei: `${message.author.username}`, origem: `${origem}`, rodada: `${rodadaatual[0].rodada_atual}` } });
+            let ataque = await Acao.findOne({ where: { rei: `${message.author.username}`, nome_acao: 'atacar', origem: `${origem}`, rodada: `${rodadaatual[0].rodada_atual}` } });
             let orig = await Mapa.findOne({ where: { nome_mapa: `${origem}` } });
             let dest = await Mapa.findOne({ where: { nome_mapa: `${destino}` } });
+
+            var acoes_totais = (acoes_barco ? acoes_barco.length : 0) + (acoes ? acoes.length : 0)
+
+            if (acoes_totais >= func.quantidadeAcoes(todos_territorios_atacante.length)) {
+                return message.channel.send(`Você atingiu o limite de ações nessa rodada`);
+            }
 
             if (!dono) {
                 return message.channel.send(`O territorio de origem não é seu`);
@@ -142,7 +158,7 @@ module.exports = {
                 }
             }
 
-            if (ataque || acao_barco) {
+             if (ataque || acao_barco) {
                 return message.channel.send(`Já existe uma ação registrada para esse territorio, espere a rodada acabar`);
             }
 

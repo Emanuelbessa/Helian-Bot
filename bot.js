@@ -33,18 +33,25 @@ sequelize
 //Comando para "Ligar" o bot
 client.once('ready', () => {
   console.log('Ready!');
+  client.user.setActivity(`Pronto para o Combate!`);
+  // client.channels.fetch('728760255152128060')
+  // .then(channel => console.log(channel.name))
+  // .catch(console.error);
+  //console.log(client.channels.cache);
+
+  const channel = client.channels.cache.find(channel => channel.name == 'bot-helian')
+  //channel.send('O bot está online @everyone')
   //Reinos.sync();
 });
 
-
 client.on('message', async message => {
 
-  if(message.content.startsWith(prefix2)){
+  if (message.content.startsWith(prefix2)) {
 
-  const args = message.content.slice(prefix2.length).split(/ +/);
-  const command = args.shift().toLowerCase();
+    const args = message.content.slice(prefix2.length).split(/ +/);
+    const command = args.shift().toLowerCase();
 
-  client.commands.get(command).execute(message, args);
+    client.commands.get(command).execute(message, args);
 
   }
 
@@ -54,9 +61,13 @@ client.on('message', async message => {
   const command = args.shift().toLowerCase();
 
   if (!client.commands.has(command)) return;
-  
-  client.commands.get(command).execute(message, args);
-  
+
+  try {
+    client.commands.get(command).execute(message, args);
+  } catch (error) {
+    console.log(error);
+    message.reply('ocorreu um erro nesse comando');
+  }
 });
 
 client.login(token);

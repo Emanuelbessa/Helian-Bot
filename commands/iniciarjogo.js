@@ -17,7 +17,7 @@ module.exports = {
             const Territorio = Territorios(sequelize, Sequelize);
 
             //Todos os Territórios que Podem servir como inicial
-            var Todos_Iniciais = ['21', '22', '23', '24', '25', '35', '36', '47', '56', '66', '65', '64', '63', '52', '51', '50', '41', '31']
+            var Todos_Iniciais = ['21', '22', '23', '24', '25', '35', '36','46', '47', '56', '66', '65', '64', '63', '51', '50','55', '41', '31']
             //Todos os Territórios Habitáveis do mapa
             var Todos_Territorios = ['11', '21', '22', '23', '24', '25', '31', '32', '33', '34', '35', '36', '37', '41', '42', '43', '44', '45', '46', '47', '50', '51', '52', '53', '54', '55', '56', '61', '63', '64', '65', '66', '73'];
             //Todos os Territorios Especiais
@@ -68,7 +68,7 @@ module.exports = {
             })
 
             especiais.forEach(function (el, i) {
-                var tropa = func.randomMinMax(15, 25)
+                var tropa = func.randomMinMax(10, 15)
                 var x = parseInt(el.split('')[0])
                 var y = el.split('')[1]
                 loca = func.numerosParaLetras(x, y)

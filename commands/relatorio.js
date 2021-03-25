@@ -33,13 +33,6 @@ module.exports = {
         var rodadacerta = parseInt(rodadaatual[0].rodada_atual) - 1;
         let seurelatorio = await Relatorio.findAll({ where: { rei: `${message.author.username}`, rodada: rodadacerta }, attributes: ['origem', 'rei', 'destino', 'mensagem', 'rodada'], raw: true });
 
-        console.log(rodadaatual[0].rodada_atual);
-        console.log(rodadacerta);
-        console.log(seurelatorio);
-        console.log(seurelatorio.length);
-
-
-
         if (seurelatorio.length >= 1) {
             message.channel.send(`Meu Rei ${message.author.username}, estes são os relatórios desta rodada:`);
             

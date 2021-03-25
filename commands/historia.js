@@ -1,4 +1,3 @@
-const Reinos = require('../models/ReinoModel.js');
 const Sequelize = require('sequelize');
 const config = require('../database');
 const sequelize = new Sequelize(config);
@@ -9,16 +8,10 @@ module.exports = {
 	execute(message, args) {
 		const { commands } = message.client;
 		if (!args.length) {
-			return message.channel.send(`Você utilizou esse comando de forma incorreta, ${message.author}!\nPara cadastrar corretamente digite:\n!historia historiadoreino`);
+			return message.channel.send(`Comando Removido`);
 		} else{
-			
-			const historia = args.join(" ");
-			
-			const Reino = Reinos(sequelize, Sequelize);
-			Reino.update({
-				historia: `${historia}`}, {where: {rei: `${message.author.username}`}});
-            
-            return message.reply(`Historia Atualizada com sucesso`);
+
+            return message.reply(`Comando Removido`);
 			
 		}
 	},

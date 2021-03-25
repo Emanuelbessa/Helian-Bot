@@ -28,10 +28,7 @@ module.exports = {
                 })
                 var territorioinicial = array[Math.floor(Math.random() * array.length)];
 
-                console.log(territorioinicial)
-
                 let reino = await Reino.findOne({ where: { rei: `${message.author.username}` }, attributes: ['rei', 'nome_reino', 'inicial_conquistado'] });
-                console.log(reino)
               
                 if (reino) {
 

@@ -1,6 +1,6 @@
 const Acoes = require('../models/AcoesModel.js');
 const Territorios = require('../models/TerritorioModel.js');
-const {name} = require('./fecharrodada');
+const { name } = require('./fecharrodada');
 const Sequelize = require('sequelize');
 const config = require('../database');
 const sequelize = new Sequelize(config);
@@ -9,19 +9,24 @@ module.exports = {
     description: 'Para encerrar a rodada corretamente digite:\n!fecharrodada  para fechar a rodada',
     async execute(message, args) {
         const { commands } = message.client;
-        if(message.author.username != 'Emanuel'){
+        if (message.author.username != 'Emanuel') {
             return message.channel.send('Você não tem permissão para usar o comando')
-        }else {
+        } else {
 
-          
-        console.log("Start!")
-        
-		setInterval(function () {
-			message.channel.send('Testando help a cada 15s');
-			message.channel.send(`&${name}`);
-		}, 1000 * 300)
-        
-        
+
+            console.log("Start!")
+
+            setInterval(function () {
+                message.channel.send('Testando help a cada 15s');
+                message.channel.send(`&${name}`);
+            }, 1000 * 300)
+
+            // console.log('start')
+            // setInterval(function () {
+            //     console.log('Testando help a cada 15s');
+            // }, 15000)
+
+
 
         }
     },

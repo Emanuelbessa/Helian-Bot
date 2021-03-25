@@ -13,7 +13,7 @@ module.exports = {
         const Reino = Reinos(sequelize, Sequelize);
 
         let temterritorio = await Territorio.findAll({ where: { rei: `${message.author.username}` }, attributes: ['localizacao', 'rei', 'nome_territorio', 'tropas', 'arqueiros'], raw: true });
-        let reino = await Reino.findOne({ where: { rei: `${message.author.username}` }, attributes: ['ouro', 'rei', 'nome_reino'], raw: true });
+        let reino = await Reino.findOne({ where: { rei: `${message.author.username}` }, attributes: ['ouro', 'rei', 'nome_reino', 'ferro', 'madeira', 'trigo', 'tecido', 'oleo'], raw: true });
 
         if (temterritorio.length >= 1 && reino) {
 
@@ -23,6 +23,7 @@ module.exports = {
 
                 message.channel.send(`Localização: **${temterritorio[i].localizacao}**; Soldados no território: **${temterritorio[i].tropas}**; Arqueiros no território: **${temterritorio[i].arqueiros}**\n`);
             }
+            message.channel.send(`Seus recursos são:\n Ferro: ${reino.ferro}\n Madeira: ${reino.madeira}\n Tecido: ${reino.tecido}\n Óleo: ${reino.oleo}\n Trigo: ${reino.trigo}`)
         } else {
             return message.channel.send(`Você não possui um Reino ou territorios`);
         }

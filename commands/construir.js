@@ -34,7 +34,7 @@ module.exports = {
             let acao = await Acao.findOne({ where: { rei: `${message.author.username}`, origem: `${lugar}`, rodada: `${rodadaatual[0].rodada_atual}` } });
             let orig = await Mapa.findOne({ where: { nome_mapa: `${lugar}` } });
             let barcos = await Barco.findAll({ where: { nome_rei: `${message.author.username}` }, order: [['nome_rei', 'DESC']], attributes: ['nome_mar', 'nome_reino', 'nome_rei'], raw: true });
-            let barco_construido = await Barco.findOne({ where: { nome_rei: `${message.author.username}`, nome_mar: `${mar}` }, order: [['nome_rei', 'DESC']], attributes: ['nome_mar', 'nome_reino', 'nome_rei'], raw: true });
+            //let barco_construido = await Barco.findOne({ where: { nome_rei: `${message.author.username}`, nome_mar: `${mar}` }, order: [['nome_rei', 'DESC']], attributes: ['nome_mar', 'nome_reino', 'nome_rei'], raw: true });
 
             const embed = {
                 "title": ":hammer: Ação de construir barco registrada :hammer:",
@@ -74,46 +74,17 @@ module.exports = {
                 return message.channel.send(`Já existe uma ação registrada para esse territorio, espere a rodada acabar ou apague suas ações`);
             }
 
-            if(barco_construido){
-                return message.channel.send(`Já existe um barco do seu reino nesse mar`);
-            }
+            // if (barco_construido) {
+            //     return message.channel.send(`Já existe um barco do seu reino nesse mar`);
+            // }
 
             if (reino.ouro < reino.custo_barco) {
                 return message.channel.send(`Você não tem ouro para construir o barco`);
             }
 
-            //Teste para saber se existem barcos desocupados
-            if (barcos.length <= reino.barcos_ocupados) {
-                return message.channel.send(`Os territórios não estão adjacentes e você não possui barcos para auxiliar.`);
-            }
-
-            var mares_controle = []
             var mares_orig = orig.nome_mar.split(',')
-            var mares_dest = mar
-            barcos.forEach(element => {
-                mares_controle.push(element.nome_mar)
-            });
 
-            var adjacentes = {
-                'norte': ['leste', 'oeste'],
-                'sul': ['leste', 'oeste'],
-                'leste': ['norte', 'sul'],
-                'oeste': ['norte', 'sul'],
-            }
-
-            var retorno = false
-            for (let a = 0; a < mares_orig.length; a++) {
-                for (let b = 0; b < mares_dest.length; b++) {
-                    var M_orig = mares_orig[a]
-                    retorno = func.mar_encontra_adjacente(M_orig, mar, mares_controle, adjacentes)
-                    if (retorno) {
-                        break
-                    }
-                }
-            }
-
-            if (retorno) {
-                reino.increment('barcos_ocupados')
+            if (mares_orig.includes(mar)) {
                 Acao.create({
                     rei: `${message.author.username}`,
                     reino: `${reino.nome_reino}`,
@@ -123,8 +94,51 @@ module.exports = {
                     rodada: `${rodadaatual[0].rodada_atual}`
                 });
                 return message.channel.send({ embed });
-            }
+            } else {
 
+                //Teste para saber se existem barcos desocupados
+                if (barcos.length <= reino.barcos_ocupados) {
+                    return message.channel.send(`Os territórios não estão adjacentes e você não possui barcos para auxiliar.`);
+                }
+
+                var mares_controle = []
+
+                var mares_dest = mar
+                barcos.forEach(element => {
+                    mares_controle.push(element.nome_mar)
+                });
+
+                var adjacentes = {
+                    'norte': ['leste', 'oeste'],
+                    'sul': ['leste', 'oeste'],
+                    'leste': ['norte', 'sul'],
+                    'oeste': ['norte', 'sul'],
+                }
+
+                var retorno = false
+                for (let a = 0; a < mares_orig.length; a++) {
+                    for (let b = 0; b < mares_dest.length; b++) {
+                        var M_orig = mares_orig[a]
+                        retorno = func.mar_encontra_adjacente(M_orig, mar, mares_controle, adjacentes)
+                        if (retorno) {
+                            break
+                        }
+                    }
+                }
+
+                if (retorno) {
+                    reino.increment('barcos_ocupados')
+                    Acao.create({
+                        rei: `${message.author.username}`,
+                        reino: `${reino.nome_reino}`,
+                        nome_acao: "construir",
+                        origem: `${lugar}`,
+                        destino: `${mar}`,
+                        rodada: `${rodadaatual[0].rodada_atual}`
+                    });
+                    return message.channel.send({ embed });
+                }
+            }
         } else {
             return message.channel.send(`Comando utilizado de forma incorreta`);
         }
